@@ -1,0 +1,37 @@
+services: 
+
+  - type: web 
+
+    name: sentrino-mcp 
+
+    env: python 
+
+    buildCommand: pip install -r requirements.txt 
+
+    startCommand: gunicorn main:app -w 2 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT 
+
+    envVars: 
+
+      - key: GITHUB_TOKEN 
+
+        sync: false 
+
+      - key: GITHUB_REPO 
+
+        sync: false 
+
+      - key: GITHUB_FILE_PATH 
+
+        sync: false 
+
+      - key: BUYER_KEY_1 
+
+        sync: false 
+
+      - key: BUYER_KEY_2 
+
+        sync: false 
+
+      - key: BUYER_KEY_3 
+
+        sync: false
