@@ -72,11 +72,10 @@ async def get_sentrino_skills(confirm: str, api_key: str) -> str:
     return content
 
 # ── Entry point ───────────────────────────────────────────────
-# Render starts this via gunicorn (see render.yaml).
-# This block is only used for local testing.
+# Expose the ASGI app so gunicorn can find it
+# This is what render.yaml's startCommand looks for: main:app
+app = mcp.http_app()
+
 if __name__ == "__main__":
-    mcp.run(
-        transport = "streamable-http",
-        host      = "0.0.0.0",
-        port      = int(os.environ.get("PORT", 8000))
-    )
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=int(os.environ.get("PORT", 8000)))
