@@ -44,7 +44,7 @@ async def get_sentrino_skills(confirm: str, api_key: str) -> str:
     confirm : str
         Must be the string 'load' to confirm intent.
     api_key : str
-        Your personal Sentrino key (starts with snk-).
+        Your personal Sentrino key (starts with dkp-).
         Provided in your purchase email.
 
     Returns the full pipeline instructions as plain text.
@@ -55,7 +55,7 @@ async def get_sentrino_skills(confirm: str, api_key: str) -> str:
     if api_key not in get_valid_keys():
         return (
             "Error 401: Invalid API key. "
-            "Check the key in your purchase email and ensure it starts with snk-."
+            "Check the key in your purchase email and ensure it starts with dkp-."
         )
 
     if confirm != "load":
