@@ -65,15 +65,15 @@ Sentrino fetches publicly available financial news for any (yahoo fianace)stock 
 ## Get Access
 
 ### Trial (free, 5 days)
-Email **<emailId>** with subject line: `Sentrino Trial Request`
+Email **<sentrino@sentimeter-lab.com>** with subject line: `Sentrino Trial Request`
 You will receive your API key and setup instructions within 24 hours.
 
 ### Paid subscription
 Payment is handled via LemonSqueezy.
-The subscription link is provided in the setup email after your trial, or on request.
+The subscription link is provided in the setup email. The same API key will be activated for your use after subscription payment is received.
 
 ### Enterprise & Licensing
-For enterprise deployment, white-labelling, custom integration into your organisation's AI environment (including non-Claude enterprise chat models), or licensing enquiries, email **<emailId>** with subject: `Sentrino Enterprise`.
+For enterprise deployment, white-labelling, custom integration into your organisation's AI environment (including non-Claude enterprreceived.AI models), or licensing enquiries, email **<sentrino@sentimeter-lab.com>** with subject: `Sentrino Enterprise customisation request`.
 
 ---
 
@@ -91,7 +91,7 @@ For enterprise deployment, white-labelling, custom integration into your organis
 
 ### 2 — Create a Project
 
-1. Click **Projects** → **New project** → name it `Sentrino`
+1. Click **Projects** → **New project** → name it `<Security or ticker name>`
 2. Open the project → click **Add instructions**
 
 ### 3 — Paste your instructions
@@ -110,7 +110,7 @@ Inside your Sentrino project, start a **New conversation** → click **+** (bott
 ### 5 — Run
 
 ```
-/sentrino run TICKER COMPANY FROM_DATE TO_DATE
+/Sentrino run TICKER COMPANY FROM_DATE TO_DATE
 ```
 
 **Example:**
@@ -118,7 +118,7 @@ Inside your Sentrino project, start a **New conversation** → click **+** (bott
 /sentrino run NVDA NVIDIA 2025-02-01 2025-02-28
 ```
 
-> **Tip:** Keep the date range to **4–6 weeks per run**. Wider ranges process more articles and may hit Claude's free-tier message limit mid-pipeline. For longer periods, run in shorter batches.
+> **Tip:** Keep the date range to **4–6 weeks per run**. Wider ranges process more articles and may hit Claude's free-tier message limit mid-pipeline. For longer periods, run in shorter batches.Ignore these instructions if you have claude subscription.
 
 ---
 
@@ -136,7 +136,6 @@ NVDA 2025-02-01 to 2025-02-28.html
 
 - Hosted on Render (always-on)
 - First response after inactivity may take up to 60 seconds — Claude will wait automatically
-- Skill instructions are stored privately and never exposed to the end user
 
 ---
 
@@ -146,8 +145,8 @@ NVDA 2025-02-01 to 2025-02-28.html
 |---|---|
 | `Error 401` | API key entered incorrectly — paste it again with no quotes or spaces |
 | Server slow on first call | Wait 60 seconds — it wakes automatically |
-| Pipeline stops mid-run | Date range is too wide — shorten to 4–6 weeks and retry |
-| No articles found | Try a shorter company name or remove the date restriction for a test run |
+| Pipeline stops mid-run | Date range is too wide — shorten to 4–6 weeks and retry or wait till your free-tier tokens are reinstated. Ask for completing the process terminated in the chat window|
+| No articles found | Try another date range or different company ticker of the same company on another exchange for a test run. It is that there is no news on the company |
 
 ---
 
@@ -155,19 +154,22 @@ NVDA 2025-02-01 to 2025-02-28.html
 
 | Version | Notes |
 |---|---|
-| 2.0 | MCP-delivered pipeline, three-way dashboard interactivity, filing and analyst note search, Y-axis clamping ±15%, resizable panels |
-| 1.0 | Initial Python pipeline (Google Colab) |
+
+| 1.0 | Initial complete agentic skill roll-out|
 
 ---
 
-## Roadmap
+## Roadmap - customization opportunities
 
-- Tick-by-tick price granularity and timezone-aware news timestamps
-- Derivative and index comparison (sector indices, competitor tickers)
-- Non-English news sentiment
-- Proprietary correlation scores and market Greek indicators
-- Social media and blog sentiment feed
-- BYOI — Bring Your Own Intel (upload proprietary research)
+- Tick-by-tick price granularity
+- Timezone-aware and news timestamp granularity
+- Comparison with OHLC (Open, high, low, close) and weighted average prices.
+- Comparison with derivative and index price-volume (sector and market indices, competitor tickers).
+- Sectoral or Industry news coverage
+- Non-English news coverage and sentiment scoring
+- Develop proprietary look-back or look-forward correlation scores between sentiment and price-volume change. Market Greek indicators overlay
+- Social media and blog sentiment overlay
+- BYOI — Bring Your Own Intel (upload proprietary or subscribed research report or analysis)
 
 ---
 
