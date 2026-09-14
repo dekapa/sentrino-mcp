@@ -1,11 +1,10 @@
-# Sentrino — Financial News Sentiment Analytics
+# Sentrino — Financial News Sentiment Analytics 
+from Sentimeter-lab
 
 > **Agentic AI pipeline that searches financial news, scores sentiment, and delivers an interactive price-sentiment dashboard — triggered by a single command inside Claude.**
 
-[![Category](https://img.shields.io/badge/category-finance-blue)]()
-[![Version](https://img.shields.io/badge/version-1.0-gold)]()
-[![Claude Compatible](https://img.shields.io/badge/claude-free%20%7C%20pro-green)]()
-[![Trial](https://img.shields.io/badge/trial-5%20days%20free-brightgreen)]()
+
+[![Category](https://img.shields.io/badge/category-finance-blue)]()[![Version](https://img.shields.io/badge/version-1.0-gold)]()[![Claude Compatible](https://img.shields.io/badge/claude-free%20%7C%20pro-green)]()[![Trial](https://img.shields.io/badge/trial-5%20days%20free-brightgreen)]()
 
 ---
 
@@ -16,16 +15,25 @@ Sentrino fetches publicly available financial news for any (yahoo fianace)stock 
 **One instruction in. One dashboard out.**
 
 ```
-/Sentrino run <ticker.exchange> <compay name> <yyyy-mm-dd> to <yyyy-mm-dd>
+/Sentrino run 
+Ticker: <ticker.exchange>
+Company nmae: <compay name>
+From date: <yyyy-mm-dd> 
+To date: <yyyy-mm-dd>
 ```
 ---
 ## Key Features
 
 - **Global multi-source aggregation of News + Filings + Analyst Notes** — searches across internet news articles, regulatory filings company law websites (e.g.SEC, FCA, RNS) and analyst recommendations
+
 - **Sentiment Scoring** — financial sentiment with signed score (Positive / Negative / Neutral) and probability breakdown
+
 - **Price-Volume-Sentiment downloadable and shareable HTML Dashboard** — interactive Chart.js HTML file with colour-coded sentiment sized dots on a price-volume chart, news table with clickable links, author and source, and article summary panel
+
 - **Three-way Interactivity** — chart, news table, and summary panel are fully linked; hover on any element highlights the others
+
 - **News article Summaries** — tone-preserving summaries for every article, displayed in the dashboard summary panel
+
 - **Multi Model Porting** — MCP can be used across multiple AI chat models though the output has only been tested for Claude
 
 
@@ -44,9 +52,10 @@ Sentrino fetches publicly available financial news for any (yahoo fianace)stock 
 ## Requirements
 
 - A Claude account (free tier supported — one custom connector included)
+
 - A personal API key and orchestrator md file (provided on trial and same continues on subscription, so no new set up on subscription)
+
 - No other software, API keys, or coding required
-- No reason why would thes skill not work on other AI Chat models client that allow connectors, plugins or agentic setup.
 
 ---
 
@@ -58,22 +67,17 @@ Sentrino fetches publicly available financial news for any (yahoo fianace)stock 
 | Individual | £10 / month | Full access, personal API key |
 
 
-**5-day free trial available.**
-
 ---
 
-## Get Access
+## Getting Trial Access and Subscription
+### Individual Access
+- Email **<sentrino@sentimeter-lab.com>** with subject line: `Sentrino Trial Request` for free 5 days
 
-### Trial (free, 5 days)
-Email **<sentrino@sentimeter-lab.com>** with subject line: `Sentrino Trial Request`
-You will receive your API key and setup instructions within 24 hours.
-
-### Paid subscription
-Payment is handled via LemonSqueezy.
-The subscription link is provided in the setup email. The same API key will be activated for your use after subscription payment is received.
+- You will receive your API key, setup instructions and subsription link (payment is handled via LemonSqueezy) within 24 hours
+The same API key will be activated after subscription payment is received.
 
 ### Enterprise & Licensing
-For enterprise deployment, white-labelling, custom integration into your organisation's AI environment (including non-Claude enterprreceived.AI models), or licensing enquiries, email **<sentrino@sentimeter-lab.com>** with subject: `Sentrino Enterprise customisation request`.
+- For enterprise deployment, white-labelling, custom integration into your organisation's AI environment (including non-Claude enterprise AI chat models), or licensing enquiries, email **<sentrino@sentimeter-lab.com>** with subject: `Sentrino Enterprise customisation request`.
 
 ---
 
@@ -91,7 +95,9 @@ For enterprise deployment, white-labelling, custom integration into your organis
 
 ### 2 — Create a Project
 
-1. Click **Projects** → **New project** → name it `<Security or ticker name>`
+1. Click **Projects** → **New project** → name it `<Company, Security or ticker name>`
+> **Tips:** 
+Opening a unique standalone Project for each of your watchlist Company helps you maintain a focussed persistent chat, carry out incremental research, ask predictive questions and saves you tokens
 2. Open the project → click **Add instructions**
 
 ### 3 — Paste your instructions
@@ -113,12 +119,33 @@ Inside your Sentrino project, start a **New conversation** → click **+** (bott
 /Sentrino run TICKER COMPANY FROM_DATE TO_DATE
 ```
 
-**Example:**
+**Example prompts:**
+
+- i) First prompt
 ```
 /sentrino run NVDA NVIDIA 2025-02-01 2025-02-28
 ```
+- ii) Extend the coverage period
+```
+Run the Sentrino for NVDA for the period from 2022-03-01 to 2022-05-31 AND and add it to the same dashboard generated above.
+```
+- iii) Adding news links sourced from other AI chat models
+```
+Add the news links below to the dashboard 
+```
+- iv) Since the news, sentiment and price-volume data is in the same project instance, you can ask questions such as below.
+```
+list top 3 news articles which witnessed the most price impact before the publishing of the news article
+```
+- v) Predict price range
 
-> **Tip:** Keep the date range to **4–6 weeks per run**. Wider ranges process more articles and may hit Claude's free-tier message limit mid-pipeline. For longer periods, run in shorter batches.Ignore these instructions if you have claude subscription.
+```
+Given the Sentiment built over last x months based on the news articles, company filings and research analyst recommendations what is a price range one can expect in next 10 days. Keep your response grounded only based on the information in this chat instance.
+```
+
+> **Tips:** 
+i) Keep the date range to **4–6 weeks per run**. Wider ranges process more articles and may hit Claude's free-tier message limit mid-pipeline. For longer periods, run in shorter batches.Ignore these instructions if you have claude subscription
+ii) Hosted on Render (always-on) - First response after inactivity may take up to 60 seconds — Claude will wait automatically
 
 ---
 
@@ -129,13 +156,6 @@ A single self-contained `.html` file delivered in the chat — open in any brows
 ```
 NVDA 2025-02-01 to 2025-02-28.html
 ```
-
----
-
-## Server
-
-- Hosted on Render (always-on)
-- First response after inactivity may take up to 60 seconds — Claude will wait automatically
 
 ---
 
@@ -154,30 +174,39 @@ NVDA 2025-02-01 to 2025-02-28.html
 
 | Version | Notes |
 |---|---|
-
-| 1.0 | Initial complete agentic skill roll-out|
+| 1.0 | Initial complete agentic skill roll-out for subscription |
 
 ---
 
 ## Roadmap - customization opportunities
 
-- Tick-by-tick price granularity
-- Timezone-aware and news timestamp granularity
-- Comparison with OHLC (Open, high, low, close) and weighted average prices.
-- Comparison with derivative and index price-volume (sector and market indices, competitor tickers).
-- Sectoral or Industry news coverage
-- Non-English news coverage and sentiment scoring
-- Develop proprietary look-back or look-forward correlation scores between sentiment and price-volume change. Market Greek indicators overlay
-- Social media and blog sentiment overlay
-- BYOI — Bring Your Own Intel (upload proprietary or subscribed research report or analysis)
+- i. Tick-by-tick price granularity
+
+- ii. Timezone-aware and news timestamp granularity
+
+- iii. Comparison with OHLC (Open, high, low) and weighted average prices
+
+- iv. Comparison with derivative and index price-volume (sector and market indices, competitor tickers)
+
+- v. Sectoral or Industry news coverage
+
+- vi. Non-English news coverage and sentiment scoring
+
+- vii. Develop correlation scores between sentiment and price-volume change
+
+- viii. Market Greek indicators overlay
+
+- ix. Social media and blog sentiment overlay
+
+- x. BYOI — Bring Your Own Intel (upload proprietary or subscribed research report or analysis)
+
+- xi. Overlay of the organisation trading (order and execution) data and integrating it with enterprise AI Chat model(s) and case management systems
 
 ---
 
 ## Contact
 
-**General:** <emailId>
-**Enterprise & Licensing:** <emailId> — subject: `Sentrino Enterprise`
-**Trial Request:** <emailId> — subject: `Sentrino Trial Request`
+**General enquiries including custamization and Enterprise adoption Licensing:** <sentrino@sentimeter-lab.com>
 
 ---
 
