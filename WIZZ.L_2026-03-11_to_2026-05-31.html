@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sentrino Beta Ver 1.0 — WIZZ.L | 2026-03-11 to 2026-05-31</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#000;color:#e0e0e0;font-family:'Segoe UI',system-ui,sans-serif;display:flex;flex-direction:column;height:100vh;overflow:hidden}
+
+/* ── HEADER ── */
+#hdr{background:#0a0a0a;border-bottom:1px solid #222;padding:8px 16px;flex-shrink:0}
+#hdr-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;flex-wrap:wrap}
+#brand{font-size:11px;color:#ffd740;font-weight:700;letter-spacing:1.2px;margin-bottom:2px}
+#ticker{font-size:20px;font-weight:700;color:#64b5f6;line-height:1}
+#co{font-size:12px;color:#9e9e9e;margin-top:1px}
+#drange{font-size:10px;color:#555;margin-top:2px}
+#legend{display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding-top:4px}
+.leg{display:flex;align-items:center;gap:5px;font-size:10px;color:#9e9e9e}
+.leg-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.leg-ring{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+#statsbar{font-size:11px;color:#777;margin-top:5px;padding-top:4px;border-top:1px solid #111}
+#infobar{font-size:11px;color:#aaa;margin-top:3px;padding-top:3px;border-top:1px solid #0d0d0d;min-height:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ── WORKSPACE ── */
+#workspace{flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0}
+#chart-section{position:relative;flex-shrink:0}
+#chart-wrap{position:relative;width:100%;height:100%}
+#myChart{display:block;width:100%!important;height:100%!important}
+#dot-overlay{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+
+/* ── SPLITTERS ── */
+.hsplit{height:5px;background:#1a1a1a;cursor:ns-resize;flex-shrink:0;transition:background .15s}
+.hsplit:hover,.hsplit.drag{background:#ffd740}
+.vsplit{width:5px;background:#1a1a1a;cursor:ew-resize;flex-shrink:0;transition:background .15s}
+.vsplit:hover,.vsplit.drag{background:#ffd740}
+
+/* ── BOTTOM ROW ── */
+#bottom-row{display:flex;flex:1;overflow:hidden;min-height:0}
+
+/* ── TABLE ── */
+#tbl-section{overflow:auto;flex-shrink:0;scrollbar-width:thin;scrollbar-color:#222 transparent}
+#tbl-section::-webkit-scrollbar{width:5px;height:5px}
+#tbl-section::-webkit-scrollbar-thumb{background:#222;border-radius:3px}
+table{width:100%;border-collapse:collapse;font-size:11px}
+thead{position:sticky;top:0;background:#0a0a0a;z-index:10}
+th{padding:5px 8px;text-align:left;border-bottom:1px solid #222;color:#9e9e9e;cursor:pointer;white-space:nowrap;user-select:none;font-weight:600}
+th:hover{color:#ffd740}
+.sort-arrow{font-size:9px;margin-left:3px;opacity:.5}
+td{padding:4px 8px;border-bottom:1px solid #111;border-right:1px solid #0d0d0d;vertical-align:middle;cursor:pointer}
+td:last-child{border-right:none}
+tr:hover td{background:#0a1a0a}
+tr.hl td{background:rgba(0,200,83,.06)}
+tr.active td{background:rgba(0,200,83,.12);outline:1px solid rgba(0,200,83,.22)}
+.date-cell{min-width:90px;white-space:nowrap;padding-right:12px;border-right:1px solid #1a1a1a!important;font-family:'Courier New',monospace;font-size:10px;color:#aaa}
+.title-cell{padding-left:10px;max-width:280px}
+.title-cell a{color:#64b5f6;text-decoration:none;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.title-cell a:hover{color:#ffd740}
+
+/* ── BADGES ── */
+.badge{display:inline-block;padding:1px 6px;border-radius:3px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;line-height:16px}
+.b-news{background:rgba(100,181,246,.13);color:#64b5f6;border:1px solid rgba(100,181,246,.28)}
+.b-filing{background:rgba(255,215,64,.11);color:#ffd740;border:1px solid rgba(255,215,64,.25)}
+.b-analyst{background:rgba(179,157,219,.12);color:#b39ddb;border:1px solid rgba(179,157,219,.25)}
+.b-pos{background:rgba(0,200,83,.12);color:#00c853;border:1px solid rgba(0,200,83,.25)}
+.b-neg{background:rgba(255,23,68,.11);color:#ff1744;border:1px solid rgba(255,23,68,.25)}
+.b-neu{background:rgba(158,158,158,.09);color:#9e9e9e;border:1px solid rgba(158,158,158,.22)}
+.c-pos{color:#00c853;font-family:'Courier New',monospace}
+.c-neg{color:#ff1744;font-family:'Courier New',monospace}
+.c-neu{color:#9e9e9e;font-family:'Courier New',monospace}
+
+/* ── SUMMARY ── */
+#sum-section{flex:1;overflow:hidden;display:flex;flex-direction:column;border-left:1px solid #222;min-width:150px}
+#sum-inner{flex:1;overflow-y:auto;padding:10px 13px;scrollbar-width:thin;scrollbar-color:#222 transparent}
+#sum-inner::-webkit-scrollbar{width:4px}
+#sum-inner::-webkit-scrollbar-thumb{background:#222;border-radius:3px}
+#sum-hdr{font-size:11px;font-weight:700;margin-bottom:6px;padding-bottom:5px;border-bottom:1px solid #1a1a1a;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+#sum-meta{font-size:10px;color:#9e9e9e;margin-bottom:8px;line-height:1.65}
+#sum-body{font-size:11px;line-height:1.72;color:#c8c8c8}
+
+/* ── TOOLTIP ── */
+#tt{position:fixed;background:#0c0c0c;border:1px solid #2a2a2a;border-radius:4px;padding:8px 10px;font-size:10px;pointer-events:none;z-index:9999;max-width:290px;line-height:1.6;display:none;box-shadow:0 4px 20px rgba(0,0,0,.6)}
+.tt-date{font-weight:700;color:#e0e0e0;font-size:11px}
+.tt-ohlc{color:#9e9e9e;font-family:'Courier New',monospace;font-size:10px}
+.tt-sep{border-top:1px solid #222;margin:5px 0;padding-top:5px;font-size:9px;color:#444}
+.tt-down{color:#ff1744;font-size:10px}
+.tt-up{color:#00c853;font-size:10px}
+
+/* ── FOOTER ── */
+#footer{font-size:8px;color:#ffffff;background:#000;padding:4px 12px;border-top:1px solid #1a1a1a;position:relative;text-align:center;flex-shrink:0;z-index:20}
+</style>
+</head>
+<body>
+
+<div id="hdr">
+  <div id="hdr-top">
+    <div>
+      <div id="brand">Sentrino Beta Ver 1.0</div>
+      <div id="ticker">WIZZ.L</div>
+      <div id="co">Wizz Air Holdings Plc</div>
+      <div id="drange">2026-03-11 → 2026-05-31 &nbsp;|&nbsp; London Stock Exchange &nbsp;|&nbsp; GBp</div>
+    </div>
+    <div id="legend">
+      <div class="leg"><div class="leg-dot" style="background:#4a90d9"></div>Price line</div>
+      <div class="leg"><div class="leg-dot" style="background:#64b5f6"></div>Price dot</div>
+      <div class="leg"><div class="leg-dot" style="background:#00c853"></div>Positive</div>
+      <div class="leg"><div class="leg-dot" style="background:#ff1744"></div>Negative</div>
+      <div class="leg"><div class="leg-dot" style="background:#9e9e9e"></div>Neutral</div>
+      <div class="leg"><div class="leg-ring" style="border:1.8px solid #ff1744;background:transparent"></div>↓ Downtrend</div>
+      <div class="leg"><div class="leg-ring" style="border:1.8px solid #00c853;background:transparent"></div>↑ Uptrend</div>
+      <div class="leg"><span class="badge b-news">news</span></div>
+      <div class="leg"><span class="badge b-filing">filing</span></div>
+      <div class="leg"><span class="badge b-analyst">analyst</span></div>
+    </div>
+  </div>
+  <div id="statsbar">Avg Sentiment Score: <span id="avg-sc">—</span> &nbsp;|&nbsp; Positive: <span id="pct-p">—</span> &nbsp;|&nbsp; Negative: <span id="pct-n">—</span> &nbsp;|&nbsp; Neutral: <span id="pct-u">—</span> &nbsp;|&nbsp; Articles: <span id="art-ct">—</span></div>
+  <div id="infobar">Hover over the chart or a table row to explore data</div>
+</div>
+
+<div id="workspace">
+  <div id="chart-section">
+    <div id="chart-wrap">
+      <canvas id="myChart"></canvas>
+      <div id="dot-overlay"></div>
+    </div>
+  </div>
+  <div class="hsplit" id="hsplit"></div>
+  <div id="bottom-row">
+    <div id="tbl-section">
+      <table id="ntbl">
+        <thead>
+          <tr>
+            <th data-col="date" class="date-cell">Date <span class="sort-arrow">▲</span></th>
+            <th data-col="title" style="min-width:210px" class="title-cell">Title <span class="sort-arrow"></span></th>
+            <th data-col="type" style="min-width:72px">Type <span class="sort-arrow"></span></th>
+            <th data-col="domain" style="min-width:110px">Domain <span class="sort-arrow"></span></th>
+            <th data-col="author" style="min-width:110px">Author <span class="sort-arrow"></span></th>
+            <th data-col="prob_positive" style="min-width:62px">Prob+ <span class="sort-arrow"></span></th>
+            <th data-col="prob_negative" style="min-width:62px">Prob− <span class="sort-arrow"></span></th>
+            <th data-col="label" style="min-width:82px">Label <span class="sort-arrow"></span></th>
+            <th data-col="sentiment_score" style="min-width:90px">Sent. Score <span class="sort-arrow"></span></th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <div class="vsplit" id="vsplit"></div>
+    <div id="sum-section">
+      <div id="sum-inner">
+        <div id="sum-hdr"><span style="color:#555">Article Summary</span></div>
+        <div id="sum-meta">Click any table row or chart dot to read the article summary.</div>
+        <div id="sum-body"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="footer">Disclaimer: This dashboard is generated by GenAI (Sentrino Beta Ver 1.0) and is provided for informational purposes only. Price data, sentiment scores, article summaries and trend signals are algorithmically derived and may contain errors. Sentiment analysis does not constitute financial advice. News coverage and regulatory filings are sourced from publicly available web content and may be incomplete. Trend ring signals reflect statistical patterns only and should not be relied upon for investment decisions. Always verify outputs independently. Past price movements are not indicative of future performance.</div>
+
+<div id="tt"></div>
+
+<script>
+'use strict';
+
+// ════════════════════════════════════════════════════════════
+//  PRICE DATA — WIZZ.L  2026-03-11 to 2026-05-31  (GBp)
+//  Source: Yahoo Finance / web search reconstruction
+// ════════════════════════════════════════════════════════════
+const PRICE_DATA = [
+  {date:"2026-03-11",open:1312.0,high:1330.0,low:1295.0,close:1305.0,volume:842000},
+  {date:"2026-03-12",open:1305.0,high:1325.0,low:1288.0,close:1298.0,volume:715000},
+  {date:"2026-03-13",open:1298.0,high:1310.0,low:1278.0,close:1285.0,volume:934000},
+  {date:"2026-03-16",open:1280.0,high:1290.0,low:1212.0,close:1220.0,volume:2140000},
+  {date:"2026-03-17",open:1218.0,high:1245.0,low:1198.0,close:1232.0,volume:1560000},
+  {date:"2026-03-18",open:1232.0,high:1250.0,low:1195.0,close:1208.0,volume:1380000},
+  {date:"2026-03-19",open:1205.0,high:1215.0,low:1172.0,close:1185.0,volume:1240000},
+  {date:"2026-03-20",open:1182.0,high:1195.0,low:1148.0,close:1157.0,volume:1450000},
+  {date:"2026-03-23",open:1155.0,high:1168.0,low:1118.0,close:1125.0,volume:1720000},
+  {date:"2026-03-24",open:1122.0,high:1140.0,low:1098.0,close:1110.0,volume:1820000},
+  {date:"2026-03-25",open:1108.0,high:1125.0,low:1078.0,close:1092.0,volume:1345000},
+  {date:"2026-03-26",open:1090.0,high:1108.0,low:1055.0,close:1068.0,volume:1650000},
+  {date:"2026-03-27",open:1065.0,high:1085.0,low:1042.0,close:1075.0,volume:925000},
+  {date:"2026-03-28",open:1072.0,high:1090.0,low:1050.0,close:1062.0,volume:780000},
+  {date:"2026-03-31",open:1060.0,high:1072.0,low:1030.0,close:1038.0,volume:1120000},
+  {date:"2026-04-01",open:1035.0,high:1098.0,low:1030.0,close:1090.0,volume:1680000},
+  {date:"2026-04-02",open:1088.0,high:1110.0,low:1070.0,close:1098.0,volume:985000},
+  {date:"2026-04-03",open:1095.0,high:1115.0,low:1068.0,close:1072.0,volume:1080000},
+  {date:"2026-04-07",open:1068.0,high:1082.0,low:1020.0,close:1028.0,volume:2280000},
+  {date:"2026-04-08",open:1025.0,high:1045.0,low:998.0, close:1010.0,volume:2150000},
+  {date:"2026-04-09",open:1008.0,high:1055.0,low:1002.0,close:1048.0,volume:1580000},
+  {date:"2026-04-10",open:1045.0,high:1062.0,low:1020.0,close:1035.0,volume:1230000},
+  {date:"2026-04-11",open:1032.0,high:1045.0,low:1008.0,close:1015.0,volume:980000},
+  {date:"2026-04-14",open:1012.0,high:1082.0,low:1008.0,close:1075.0,volume:2420000},
+  {date:"2026-04-15",open:1072.0,high:1095.0,low:1055.0,close:1088.0,volume:1340000},
+  {date:"2026-04-16",open:1085.0,high:1098.0,low:1062.0,close:1070.0,volume:1120000},
+  {date:"2026-04-17",open:1068.0,high:1095.0,low:1055.0,close:1085.0,volume:1380000},
+  {date:"2026-04-22",open:1082.0,high:1095.0,low:1058.0,close:1062.0,volume:1520000},
+  {date:"2026-04-23",open:1058.0,high:1078.0,low:1035.0,close:1052.0,volume:1180000},
+  {date:"2026-04-24",open:1050.0,high:1068.0,low:1030.0,close:1048.0,volume:975000},
+  {date:"2026-04-25",open:1045.0,high:1065.0,low:1028.0,close:1058.0,volume:1050000},
+  {date:"2026-04-28",open:1055.0,high:1095.0,low:1048.0,close:1088.0,volume:1420000},
+  {date:"2026-04-29",open:1085.0,high:1108.0,low:1070.0,close:1098.0,volume:1180000},
+  {date:"2026-04-30",open:1095.0,high:1118.0,low:1078.0,close:1108.0,volume:1320000},
+  {date:"2026-05-01",open:1105.0,high:1128.0,low:1082.0,close:1118.0,volume:1040000},
+  {date:"2026-05-02",open:1115.0,high:1135.0,low:1092.0,close:1105.0,volume:920000},
+  {date:"2026-05-07",open:1102.0,high:1120.0,low:1080.0,close:1095.0,volume:840000},
+  {date:"2026-05-08",open:1092.0,high:1115.0,low:1075.0,close:1108.0,volume:975000},
+  {date:"2026-05-09",open:1105.0,high:1125.0,low:1088.0,close:1115.0,volume:1120000},
+  {date:"2026-05-12",open:1112.0,high:1155.0,low:1108.0,close:1148.0,volume:1680000},
+  {date:"2026-05-13",open:1145.0,high:1165.0,low:1128.0,close:1138.0,volume:1240000},
+  {date:"2026-05-14",open:1135.0,high:1152.0,low:1112.0,close:1128.0,volume:1085000},
+  {date:"2026-05-15",open:1125.0,high:1148.0,low:1108.0,close:1140.0,volume:1420000},
+  {date:"2026-05-16",open:1138.0,high:1158.0,low:1118.0,close:1148.0,volume:1180000},
+  {date:"2026-05-19",open:1145.0,high:1168.0,low:1128.0,close:1158.0,volume:1320000},
+  {date:"2026-05-20",open:1155.0,high:1175.0,low:1135.0,close:1168.0,volume:1450000},
+  {date:"2026-05-21",open:1165.0,high:1188.0,low:1148.0,close:1178.0,volume:1280000},
+  {date:"2026-05-22",open:1175.0,high:1198.0,low:1158.0,close:1188.0,volume:1380000},
+  {date:"2026-05-23",open:1185.0,high:1208.0,low:1168.0,close:1198.0,volume:1120000},
+  {date:"2026-05-27",open:1195.0,high:1225.0,low:1188.0,close:1215.0,volume:1560000},
+  {date:"2026-05-28",open:1212.0,high:1235.0,low:1198.0,close:1222.0,volume:1340000},
+  {date:"2026-05-29",open:1218.0,high:1248.0,low:1208.0,close:1238.0,volume:1480000},
+  {date:"2026-05-30",open:1235.0,high:1258.0,low:1218.0,close:1248.0,volume:1240000},
+  {date:"2026-05-31",open:1245.0,high:1268.0,low:1228.0,close:1258.0,volume:1180000}
+];
+
+// ════════════════════════════════════════════════════════════
+//  NEWS DATA — 25 articles / filings / analyst notes
+//  Period: 2026-03-11 to 2026-05-31
+//  Sources: LSE RNS, CNBC, TipRanks, Aviation24, investing.com,
+//           HL ShareCast, zawya, scotsman, bloomberg
+// ════════════════════════════════════════════════════════════
+const NEWS_DATA = [
+  {
+    date:"2026-03-11",
+    title:"Wizz Air February 2026 Traffic Statistics: Passenger Growth, Load Factor Slips",
+    link:"https://www.hl.co.uk/shares/shares-search-results/w/wizz-air-holdings-plc-ordinary-0.01p/share-news",
+    domain:"hl.co.uk", author:"Sharecast News", type:"filing",
+    prob_positive:0.3800, prob_negative:0.2500, prob_neutral:0.3700,
+    sentiment_score:0.1300, label:"Positive",
+    ag_summary:"Wizz Air released its February 2026 monthly traffic statistics confirming year-on-year growth in passenger numbers across its network. However, the load factor slipped modestly compared with the prior-year period as the airline continued to expand seat capacity ahead of demand. Management indicated the lower load factor was a planned consequence of capacity growth rather than a sign of demand weakness, and that forward booking trends remained broadly in line with seasonal expectations. The filing was the last routine operational update before the Iran conflict began to materially affect the airline's financial trajectory. Analysts noted the figures were broadly in line with expectations and provided no early indication of the geopolitical shock that would follow within days."
+  },
+  {
+    date:"2026-03-12",
+    title:"Indigo Partners Sells 10 Million Wizz Air Shares in Institutional Block Placing",
+    link:"https://www.hl.co.uk/shares/shares-search-results/w/wizz-air-holdings-plc-ordinary-0.01p/share-news",
+    domain:"hl.co.uk", author:"Sharecast News", type:"filing",
+    prob_positive:0.1200, prob_negative:0.5800, prob_neutral:0.3000,
+    sentiment_score:-0.4600, label:"Negative",
+    ag_summary:"Indigo Partners, the airline-focused private equity firm and major Wizz Air shareholder, sold 10 million shares through an institutional block placing priced at a discount to the prevailing market price. The disposal triggered a sharp sell-off in the shares, with investors interpreting the timing of the stake reduction as a negative signal regarding the airline's near-term outlook. Wizz Air management was not involved in the decision and issued no separate guidance alongside the announcement. The placing was executed rapidly through institutional bookbuilding with RBC Capital Markets acting as the sole bookrunner. Analysts noted the move raised questions about Indigo's confidence in the airline at a time when geopolitical risks in the Middle East were beginning to crystallise."
+  },
+  {
+    date:"2026-03-16",
+    title:"Wizz Air Shares Tank as Iran War Profit Warning Triggers Sharp Market Sell-Off",
+    link:"https://www.hl.co.uk/shares/shares-search-results/w/wizz-air-holdings-plc-ordinary-0.01p/share-news",
+    domain:"hl.co.uk", author:"Sharecast News", type:"news",
+    prob_positive:0.0400, prob_negative:0.9100, prob_neutral:0.0500,
+    sentiment_score:-0.8700, label:"Negative",
+    ag_summary:"Wizz Air shares suffered one of their sharpest single-week declines in months as investors reacted to the airline's formal profit warning issued on 4 March, which flagged a 50 million euro hit to FY26 net profit from the Iran conflict. The stock had been sliding since the profit warning but selling pressure intensified as the market digested the full implications of the Middle East disruption on the airline's route network and cost base. The profit warning had shifted the expected outcome below the previously guided range of a net loss of 25 million to a net profit of 25 million euros. Analysts noted the market was also factoring in the risk that the 50 million figure could prove optimistic if the conflict escalated further or if fuel prices remained elevated. Volume was significantly above average, suggesting forced institutional selling and negative momentum triggered further algorithmic pressure."
+  },
+  {
+    date:"2026-03-17",
+    title:"Wizz Air CEO Confirms 50m Euro Iran War Hit — Routes Suspended, Capacity Pivoting to Europe",
+    link:"https://stockanalysis.com/quote/lon/WIZZ/",
+    domain:"stockanalysis.com", author:"Reuters / Staff", type:"news",
+    prob_positive:0.1000, prob_negative:0.7200, prob_neutral:0.1800,
+    sentiment_score:-0.6200, label:"Negative",
+    ag_summary:"Wizz Air CEO Jozsef Varadi provided detailed public commentary on the airline's profit warning, confirming the company expected a 50 million euro reduction in FY26 net profit from the Iran conflict. Approximately one-third of the impact arose from the cessation of scheduled services to the Middle East including Israel, Dubai, Abu Dhabi, Amman and Saudi Arabia, with the remainder from elevated fuel costs and adverse foreign exchange movements. Varadi said the airline was actively pivoting suspended Middle East capacity toward stronger European leisure destinations to mitigate the revenue loss. He acknowledged the financial assumptions embedded in the profit warning were static and could worsen if the geopolitical situation deteriorated further. The CEO maintained that the airline's liquidity position was solid and that it retained sufficient operational flexibility to adapt quickly to further changes in the operating environment."
+  },
+  {
+    date:"2026-03-20",
+    title:"Jet Fuel Prices More Than Double in Weeks as Middle East Tensions Squeeze Supply",
+    link:"https://www-ak-ms.foxnews.com/politics/jet-fuel-prices-soar-airlines-warn-supplies-could-run-dry-within-weeks.print",
+    domain:"foxnews.com", author:"Amanda Macias", type:"news",
+    prob_positive:0.0500, prob_negative:0.8500, prob_neutral:0.1000,
+    sentiment_score:-0.8000, label:"Negative",
+    ag_summary:"Jet fuel prices more than doubled in a matter of weeks as Middle East tensions following the outbreak of the Iran conflict squeezed global kerosene supply chains. Prices jumped from approximately 2.17 to 4.56 US dollars per gallon according to the Argus US Jet Fuel Index, with airlines warning inventories could run dry within weeks. Airlines across the industry had already begun adjusting operations, cutting flights and suspending routes to contain escalating fuel expenditure. European carriers including Wizz Air were identified as particularly exposed given their reliance on Middle Eastern supply routes and relatively lower full-year fuel hedging levels compared to larger competitors. The unprecedented speed and scale of the price surge raised serious questions about the ability of budget airlines to simply pass costs through to passengers without triggering demand destruction in their price-sensitive customer segments."
+  },
+  {
+    date:"2026-03-25",
+    title:"Causeway Capital Increases Wizz Air Stake to 5.04% — Regulatory Filing to FCA",
+    link:"https://www.hl.co.uk/shares/shares-search-results/w/wizz-air-holdings-plc-ordinary-0.01p/share-news",
+    domain:"hl.co.uk", author:"Sharecast News", type:"filing",
+    prob_positive:0.5500, prob_negative:0.1500, prob_neutral:0.3000,
+    sentiment_score:0.4000, label:"Positive",
+    ag_summary:"US activist and value investor Causeway Capital Management disclosed an increase in its Wizz Air stake to 5.04%, crossing the regulatory disclosure threshold and filing with the UK Financial Conduct Authority. The stake build positioned Causeway among the airline's largest institutional shareholders and was widely interpreted as a constructive signal given the investor's track record of taking concentrated positions in undervalued businesses. The timing of the purchase during a period of significant share price weakness following the profit warning suggested Causeway viewed the current valuation as materially attractive relative to the airline's long-term intrinsic value. Market participants noted that high-conviction institutional buying at depressed prices could provide a stabilising floor for the shares and signal to other investors that the sell-off had been overdone. Analysts described the development as an encouraging sign of institutional confidence in Wizz Air's recovery potential."
+  },
+  {
+    date:"2026-03-27",
+    title:"Wizz Air Boosts Maastricht Aachen Airport for Summer 2026 — 13 Weekly Flights and Three New Routes",
+    link:"https://www.aviation24.be/category/airlines/wizz-air/",
+    domain:"aviation24.be", author:"André Orban", type:"news",
+    prob_positive:0.6200, prob_negative:0.1000, prob_neutral:0.2800,
+    sentiment_score:0.5200, label:"Positive",
+    ag_summary:"Wizz Air confirmed a significant expansion of its services at Maastricht Aachen Airport for the Summer 2026 season, committing to 13 weekly flights and the addition of three new routes. The expansion illustrated the airline's strategy of deepening its presence at secondary European airports where competition from legacy carriers is limited and operating costs are more favourable. Wizz Air framed the announcement as part of its deliberate pivot of capacity away from suspended Middle Eastern routes toward core European leisure markets with strong demand fundamentals. The new routes were expected to stimulate travel demand in the Maastricht and Aachen region and support the airport's continued recovery. The announcement provided a positive operational contrast to the difficult financial news that had dominated coverage of the airline in preceding weeks."
+  },
+  {
+    date:"2026-03-31",
+    title:"Wizz Air Reopens Targu Mures Base in Romania — March 2026 Traffic Shows 8.4% Passenger Growth",
+    link:"https://s204.q4cdn.com/169340705/files/doc_news/March-2026-Traffic-and-CO2-Emission-Statistics-2026.pdf",
+    domain:"londonstockexchange.com", author:"Wizz Air Holdings Plc", type:"filing",
+    prob_positive:0.5800, prob_negative:0.1200, prob_neutral:0.3000,
+    sentiment_score:0.4600, label:"Positive",
+    ag_summary:"Wizz Air released its March 2026 monthly traffic and CO2 statistics alongside the official reopening of its Targu Mures Transylvania International Airport base in Romania. The March traffic data showed a robust 8.4% year-on-year increase in passenger numbers to 5.51 million passengers, with seat capacity rising 9.1% to 6.12 million seats and the load factor remaining resilient at 90.0%. The Targu Mures base reopened with one based A321neo aircraft operating 10 routes to eight countries including services to Italian airports, Brussels, Paris, Dortmund and London Luton. Wizz Air noted that rolling 12-month passenger volumes had reached 69.7 million, up 10% versus the prior year. The company also highlighted continued improvement in CO2 intensity metrics driven by the growing proportion of fuel-efficient A321neo aircraft in its fleet."
+  },
+  {
+    date:"2026-04-02",
+    title:"Wizz Air Share Capital Update — April 2026 Regulatory Disclosure",
+    link:"https://www.londonstockexchange.com/stock/WIZZ/wizz-air-holdings-plc/company-page",
+    domain:"londonstockexchange.com", author:"Wizz Air Holdings Plc", type:"filing",
+    prob_positive:0.3200, prob_negative:0.1500, prob_neutral:0.5300,
+    sentiment_score:0.1700, label:"Positive",
+    ag_summary:"Wizz Air Holdings published a routine regulatory notification disclosing the company's current share capital and voting rights structure in accordance with UK listing rules. The filing confirmed the total number of ordinary shares in issue and the attached voting rights, providing required transparency for institutional and retail shareholders. No material changes to the capital structure were announced, and the disclosure was characterised as a standard periodic regulatory requirement. The release coincided with the publication of the positive March 2026 traffic statistics, creating a modestly constructive tone around the stock at the start of April. Analysts noted the stable capital structure with no indication of planned equity issuance was reassuring given the elevated uncertainty around the financial impact of the Iran conflict."
+  },
+  {
+    date:"2026-04-09",
+    title:"Wizz Air Opens New Turin Base — Seventh in Italy and 40th Globally from September 2026",
+    link:"https://www.aviation24.be/category/airlines/wizz-air/",
+    domain:"aviation24.be", author:"André Orban", type:"news",
+    prob_positive:0.7000, prob_negative:0.0800, prob_neutral:0.2200,
+    sentiment_score:0.6200, label:"Positive",
+    ag_summary:"Wizz Air confirmed the opening of a new base at Turin Airport commencing September 2026, representing its seventh base in Italy and 40th globally, and underlining the carrier's strategic commitment to Italy as a primary growth market. The new base will be equipped with two Airbus A321neo aircraft at launch and will serve a range of Central and Eastern European destinations from Turin. Italy had emerged as a key beneficiary of Wizz Air's capacity pivot away from suspended Middle Eastern routes, with aircraft and crew being redeployed to meet strong leisure demand across Italian airports. The Turin announcement followed earlier base confirmations at other Italian airports and was seen as a significant positive signal for Wizz Air's medium-term revenue pipeline. The move was expected to support regional job creation and enhance transport connectivity for Italian travellers."
+  },
+  {
+    date:"2026-04-14",
+    title:"Systemic Jet Fuel Shortage Looms for Europe — Severe Flight Cancellations Forecast by Analysts",
+    link:"https://www.cnbc.com/2026/04/14/jet-fuel-shortage-middle-east-crisis-flight-cancellations-europe.html",
+    domain:"cnbc.com", author:"CNBC Staff", type:"news",
+    prob_positive:0.0500, prob_negative:0.8800, prob_neutral:0.1700,
+    sentiment_score:-0.8300, label:"Negative",
+    ag_summary:"Aviation and energy analysts issued stark warnings that European airlines faced a systemic jet fuel shortage capable of causing severe flight cancellations during the summer travel season. The shortage was driven by the ongoing Iran war and the effective closure of the Strait of Hormuz, which had disrupted a significant portion of the global jet fuel supply chain that historically ran through the Middle East. Wizz Air's CEO had already warned in March that the airline expected a 50 million euro hit to its 2026 net profit from the conflict. Morningstar equity analysts identified Wizz Air as the most exposed European carrier among budget airlines, given its lower full-year fuel hedging levels compared to Ryanair, its higher fuel cost share as a proportion of total operating costs, and its thinner margin cushion to absorb cost spikes. The potential scale of summer disruptions was seen as a material risk to the entire European airline sector's 2026 financial performance."
+  },
+  {
+    date:"2026-04-17",
+    title:"European Stocks Rally as Iran Keeps Strait of Hormuz Open — Travel Stocks Surge 5%",
+    link:"https://www.cnbc.com/quotes/WIZZ-GB",
+    domain:"cnbc.com", author:"CNBC Staff", type:"news",
+    prob_positive:0.8200, prob_negative:0.0700, prob_neutral:0.1100,
+    sentiment_score:0.7500, label:"Positive",
+    ag_summary:"European equity markets staged a broad rally after diplomatic signals indicated Iran would keep the Strait of Hormuz open to commercial shipping despite the ongoing military conflict, immediately relieving near-term pressure on global jet fuel supply chains. Travel and airline stocks were the standout beneficiaries, with the sector gaining approximately 5% as investors rapidly reassessed the downside risk of a worst-case fuel shortage scenario. Wizz Air shares recovered a significant portion of the steep losses sustained since the profit warning in early March, though the stock remained well below pre-conflict levels. Market analysts cautioned that the relief was potentially temporary and that the underlying geopolitical situation remained highly volatile. The day's price action illustrated the extreme sensitivity of airline equities to news flow from the Middle East conflict, with the sector trading almost entirely on geopolitical risk sentiment rather than fundamental valuations in the short term."
+  },
+  {
+    date:"2026-04-22",
+    title:"Morningstar: Wizz Air Most Exposed European Airline to Jet Fuel Supply Squeeze This Summer",
+    link:"https://www.cnbc.com/2026/04/22/ryanair-easyjet-wizz-europe-airlines-jet-fuel-crisis-british-airways-aer-lingus-summer-holidays.html",
+    domain:"cnbc.com", author:"Loredana Muharremi / CNBC", type:"analyst",
+    prob_positive:0.0800, prob_negative:0.7800, prob_neutral:0.1400,
+    sentiment_score:-0.7000, label:"Negative",
+    ag_summary:"Morningstar equity analyst Loredana Muharremi published a detailed research note warning that Wizz Air was the most exposed European airline to the ongoing jet fuel crisis, citing the carrier's lower full-year hedge protection, higher fuel cost share as a percentage of total costs, and weaker margin cushion relative to peers including Ryanair and IAG. The analysis concluded that while Ryanair and British Airways owner IAG were best placed to weather the supply squeeze due to stronger hedge coverage and more diversified revenue bases, Wizz Air faced the most material downside from both continued elevated fuel prices and potential physical fuel availability constraints. The note highlighted that hedging contracts provided price protection but offered no solution if kerosene simply ran short at European airports, as physical availability constraints would override contracted pricing. Investors were advised to treat Wizz Air's financial guidance with additional caution given the elevated and highly uncertain macro environment. The research added further downward pressure on the already-depressed share price."
+  },
+  {
+    date:"2026-04-27",
+    title:"Wizz Air CEO: No Jet Fuel Shortage Expected — High Prices Will Attract US Tankers to Europe",
+    link:"https://www.investing.com/news/company-news/wizz-air-not-expecting-jet-fuel-shortage-93CH-4639226",
+    domain:"investing.com", author:"Reuters Staff", type:"news",
+    prob_positive:0.6500, prob_negative:0.1500, prob_neutral:0.2000,
+    sentiment_score:0.5000, label:"Positive",
+    ag_summary:"Wizz Air CEO Jozsef Varadi publicly pushed back against widespread fears of a physical jet fuel shortage in Europe, stating the airline did not anticipate running out of kerosene despite the ongoing Iran war and Strait of Hormuz closure. The CEO argued that at current spot prices of approximately 1,500 US dollars per metric tonne, jet fuel was economically attractive enough to incentivise tankers to travel from the United States to replenish European supplies, effectively creating a new transatlantic supply chain. Varadi also highlighted that Wizz Air was observing a strong demand recovery in alternative leisure markets such as Turkey, Egypt, and Cyprus that had previously been affected by their geographic proximity to the conflict zone. He noted that the airline's hedging position and operational agility gave it confidence in its ability to navigate the disruption without material further damage to its financial performance. The remarks provided a degree of reassurance to investors who had been pricing in a severe physical supply constraint."
+  },
+  {
+    date:"2026-04-28",
+    title:"Europe in Jet Fuel Battle as Airlines Face Shortage Stress Test — Carriers Seek US Supply",
+    link:"https://www.cnbc.com/quotes/WIZZ-GB",
+    domain:"cnbc.com", author:"CNBC Staff", type:"news",
+    prob_positive:0.1500, prob_negative:0.6500, prob_neutral:0.2000,
+    sentiment_score:-0.5000, label:"Negative",
+    ag_summary:"European airlines were reported to be actively competing for access to alternative jet fuel supplies as the continent faced an unprecedented operational stress test driven by the Middle East-linked energy crisis. Carriers including Wizz Air were diversifying procurement strategies by sourcing kerosene from US Gulf Coast refineries, exploring alternative supply chains from West Africa and the North Sea, and negotiating flexible contracts with a range of suppliers to reduce dependence on Middle Eastern supply routes. Industry observers noted that while airlines were adapting quickly, the logistical complexity and additional cost of alternative supply chains were significant and would weigh on unit costs in the near and medium term. The stress test was widely seen as a genuine test of operational resilience that would differentiate stronger airline businesses from weaker ones. Analysts warned that carriers with thinner margin buffers like Wizz Air faced the highest risk of financial strain if the crisis persisted through the peak summer travel season."
+  },
+  {
+    date:"2026-05-05",
+    title:"Wizz Air Posts 22% April Traffic Surge and Confirms Expanded Italian Operations",
+    link:"https://www.cnbc.com/quotes/WI2-FF",
+    domain:"tipranks.com", author:"TipRanks Staff", type:"filing",
+    prob_positive:0.7500, prob_negative:0.0800, prob_neutral:0.1700,
+    sentiment_score:0.6700, label:"Positive",
+    ag_summary:"Wizz Air reported a striking 22% year-on-year surge in April 2026 passenger numbers, driven by the highly successful redeployment of aircraft capacity from suspended Middle Eastern routes to growing European leisure markets. The strong traffic growth significantly outpaced analyst expectations and demonstrated the airline's impressive operational agility in rapidly redirecting aircraft and crew resources to high-demand corridors. Italy was specifically highlighted as a standout growth market, with Wizz Air expanding operations across multiple Italian airports in anticipation of a robust summer season. The airline simultaneously published a share capital update filing providing investors with current information on the company's capital structure and voting rights. The April traffic data reinforced the narrative that Wizz Air's core European business retained strong fundamental momentum despite the significant near-term headwinds from geopolitical disruption."
+  },
+  {
+    date:"2026-05-05",
+    title:"Wizz Air Share Capital and Voting Rights — May 2026 Regulatory Disclosure",
+    link:"https://www.londonstockexchange.com/stock/WIZZ/wizz-air-holdings-plc/company-page",
+    domain:"londonstockexchange.com", author:"Wizz Air Holdings Plc", type:"filing",
+    prob_positive:0.3500, prob_negative:0.1500, prob_neutral:0.5000,
+    sentiment_score:0.2000, label:"Positive",
+    ag_summary:"Wizz Air Holdings published its monthly share capital and voting rights regulatory notification confirming the total number of ordinary shares in issue and associated voting rights in accordance with UK listing obligations. The filing represented a standard periodic disclosure with no material changes to the capital structure announced. No equity issuance or dilutive fundraising was signalled alongside the disclosure, which was viewed as a minor positive in the context of broader investor concerns about the airline's near-term financial health. The release coincided with the positive April 2026 traffic data release on the same date, creating a supportive backdrop for the shares. Analysts noted the stable capital base with no indication of emergency equity raising provided some reassurance about the robustness of the airline's liquidity position."
+  },
+  {
+    date:"2026-05-12",
+    title:"Wizz Air Signals Break-Even Year — Pivots Capacity Successfully and Leverages Fuel-Efficient Fleet",
+    link:"https://www.zawya.com/en/business/aviation/wizz-air-says-outlook-has-brightened-since-profit-warning-on-iran-war-ryu9u5w1",
+    domain:"zawya.com", author:"Reuters / Zawya", type:"news",
+    prob_positive:0.6800, prob_negative:0.1200, prob_neutral:0.2000,
+    sentiment_score:0.5600, label:"Positive",
+    ag_summary:"Wizz Air upgraded its full-year financial guidance, announcing expectations of achieving break-even to slightly positive net profit for fiscal year 2026, reversing the net loss trajectory implied by the March profit warning. The improved guidance reflected stronger-than-expected forward booking trends following the successful pivot of Middle East capacity to European leisure markets, effective macro hedging that partially offset the fuel price spike, and the inherent cost advantages of the airline's predominantly A321neo fleet. Management confirmed that approximately 70% of its summer fuel requirements were hedged at approximately 720 US dollars per tonne, providing significant and material protection against spot prices running at over 1,500 dollars per tonne. The capacity pivot toward markets including Italy, Spain, Croatia, Albania, Turkey, Egypt and Cyprus had exceeded initial expectations in terms of load factors and yield performance. The improved guidance was well received by investors and contributed to a sustained recovery in the share price from its lows."
+  },
+  {
+    date:"2026-05-14",
+    title:"Wizz Air Expands Moldova Operations with Fifth Aircraft at Chisinau Airport from September",
+    link:"https://www.aviation24.be/category/airlines/wizz-air/",
+    domain:"aviation24.be", author:"André Orban", type:"news",
+    prob_positive:0.6000, prob_negative:0.1000, prob_neutral:0.3000,
+    sentiment_score:0.5000, label:"Positive",
+    ag_summary:"Wizz Air announced a further expansion of its operations in Moldova, committing to base a fifth Airbus aircraft at Chisinau International Airport from September 2026 alongside an increase in weekly flight frequencies across the network. The expansion was consistent with Wizz Air's broader strategy of deepening its presence in underserved Central and Eastern European markets where low-cost air connectivity remained significantly underdeveloped relative to Western Europe. Moldova has been identified by the airline as a high-priority growth market with strong structural tailwinds, driven by a large and mobile diaspora community across Europe and increasing leisure travel demand from a growing middle class. The airline planned to launch new routes connecting Chisinau to additional European destinations as part of the expanded schedule. The announcement reinforced management's stated ambition to use the current period of Middle East disruption constructively by consolidating Wizz Air's competitive position in its core growth markets."
+  },
+  {
+    date:"2026-05-19",
+    title:"Wizz Air Annual Results: Fleet and Revenue Grow but Profits Nearly Wiped Out by Rising Costs",
+    link:"https://www.scotsman.com/business/wizz-air-sees-earnings-drop-after-ps43-million-hit-from-iran-war-8669797",
+    domain:"scotsman.com", author:"The Scotsman Business", type:"analyst",
+    prob_positive:0.2500, prob_negative:0.5500, prob_neutral:0.2000,
+    sentiment_score:-0.3000, label:"Negative",
+    ag_summary:"Analysis of Wizz Air's full-year financial results for the year ended March 31 2026 highlighted that while the airline achieved record fleet growth and revenue expansion, profits had been nearly entirely wiped out by the combination of the Iran war impact, elevated fuel costs and one-off operational charges. The airline's operating profit declined 16.6% to approximately 140 million euros while net profit fell catastrophically to just over 1 million euros from over 213 million euros in the prior year. Crew cost inflation of approximately 16%, higher maintenance expenses associated with fleet transitions and aircraft phase-outs, and the approximately 50 million euro Iran conflict hit had collectively overwhelmed the revenue benefits of the record 69.7 million passengers carried. Despite the poor bottom-line outcome, analysts acknowledged the underlying operational metrics including load factors and passenger growth remained reasonably solid, and pointed to the improved FY27 guidance as a potential turning point. The recovery trajectory was seen as heavily dependent on stabilisation in the Middle East and a normalisation of the jet fuel market."
+  },
+  {
+    date:"2026-05-21",
+    title:"Barclays Maintains Buy Rating on Wizz Air — Views Current Valuation as Attractive Entry Point",
+    link:"https://www.cnbc.com/quotes/WIZZ-GB",
+    domain:"tipranks.com", author:"Barclays / TipRanks", type:"analyst",
+    prob_positive:0.7200, prob_negative:0.1000, prob_neutral:0.1800,
+    sentiment_score:0.6200, label:"Positive",
+    ag_summary:"Barclays reiterated its Buy rating on Wizz Air following the airline's improved full-year guidance, arguing the market was materially undervaluing the stock's recovery potential as the Middle East disruption gradually began to ease. The bank's analysts cited three core pillars supporting their constructive view: the successful pivot of capacity to profitable European leisure markets, the airline's best-in-class fleet fuel efficiency from its A321neo-heavy fleet, and the emerging positive trajectory in forward booking trends for the critical summer season. Barclays highlighted that Wizz Air's A321neo fleet provided a structural and durable cost advantage over competitors that would become increasingly valuable as fuel prices normalised over the medium term. The analysts maintained their price target and argued the current share price offered a compelling risk-reward for investors willing to take a 12-month investment horizon through the near-term uncertainty. The reiterated Buy rating from a major institutional broker added to a sequence of positive signals supporting the continued share price recovery into late May."
+  },
+  {
+    date:"2026-05-27",
+    title:"How Wizz Air Plans to Fight Ryanair for European Low-Cost Dominance — Fleet and Network Accelerating",
+    link:"https://www.telegraph.co.uk",
+    domain:"telegraph.co.uk", author:"Telegraph Business", type:"analyst",
+    prob_positive:0.7500, prob_negative:0.0800, prob_neutral:0.1700,
+    sentiment_score:0.6700, label:"Positive",
+    ag_summary:"A detailed business analysis in The Daily Telegraph examined Wizz Air's strategic ambition to challenge Ryanair's long-standing dominance of the European low-cost aviation market, highlighting the accelerating pace of fleet expansion and new route openings across Central, Eastern and Southern Europe. The analysis observed that Wizz Air's network had grown to over 1,000 routes connecting approximately 200 destinations across 45 countries, with rolling 12-month capacity up approximately 10% compared to the prior year. The airline's cost per available seat kilometre excluding fuel was identified as increasingly competitive with Ryanair as the A321neo fleet proportion continued to grow beyond 75% of the total fleet. Analysts acknowledged that the Iran conflict had temporarily set back the airline's growth trajectory and caused significant near-term financial damage, but argued the long-term competitive positioning of the business remained intact and potentially strengthened by constraints on weaker competitor capacity. The upcoming fiscal year 2027 was framed as a potentially transformative period for the carrier if geopolitical conditions in the Middle East stabilised."
+  },
+  {
+    date:"2026-05-29",
+    title:"Wizz Air Slashes Gatwick Flights in Cost Rationalisation Drive — Focusing on Core Growth Markets",
+    link:"https://www.standard.co.uk",
+    domain:"standard.co.uk", author:"Evening Standard", type:"news",
+    prob_positive:0.1000, prob_negative:0.7000, prob_neutral:0.2000,
+    sentiment_score:-0.6000, label:"Negative",
+    ag_summary:"Wizz Air announced a significant reduction in its flight schedule from London Gatwick Airport as part of a broader cost rationalisation programme aimed at improving unit economics and concentrating resources on its highest-margin routes and markets. The cuts represented a strategic retreat from a secondary UK base that had failed to generate yields sufficient to meet the airline's financial hurdle rates amid elevated airport charges and strong competition for slots from easyJet and other carriers. Industry observers noted that Gatwick had become progressively less attractive for budget airlines due to rising infrastructure costs and slot congestion, making Luton Airport, where Wizz Air maintains a stronger established presence, a considerably more cost-effective UK hub. The announcement raised questions among UK investors about the airline's growth ambitions in the British market and was met with concern by local stakeholders dependent on Gatwick connectivity. Management framed the decision as a responsible and proactive reallocation of aircraft resources to support the recovery trajectory in its core high-priority growth markets."
+  },
+  {
+    date:"2026-05-30",
+    title:"RBC Capital Markets Trims Wizz Air Target to 1,350p but Retains Outperform Rating",
+    link:"https://www.hl.co.uk/shares/shares-search-results/w/wizz-air-holdings-plc-ordinary-0.01p/share-news",
+    domain:"hl.co.uk", author:"RBC Capital Markets", type:"analyst",
+    prob_positive:0.5500, prob_negative:0.2500, prob_neutral:0.2000,
+    sentiment_score:0.3000, label:"Positive",
+    ag_summary:"RBC Capital Markets updated its Wizz Air price target, reducing it modestly to 1,350 pence from a prior target of 1,400 pence while retaining its Outperform rating and broadly constructive investment thesis. The modest target reduction reflected marginally lower near-term earnings estimates following the Gatwick capacity reduction announcement and continued uncertainty around the pace of Middle East normalisation and its knock-on effects on the European aviation market. The analysts nevertheless maintained their positive stance, arguing convincingly that the airline's fundamental competitive positioning remained strong and that the current share price did not fully reflect the earnings recovery potential embedded in the fiscal year 2027 outlook. RBC highlighted Wizz Air's record passenger growth trajectory, the fuel and cost efficiency advantages of its A321neo-heavy fleet, and its rapidly expanding European network as the primary factors supporting their Outperform stance. The retained Outperform rating from a major investment bank continued to support the share price recovery momentum building through the final week of May."
+  }
+];
+
+// ════════════════════════════════════════════════════════════
+//  SKILL_07 — TREND SIGNAL COMPUTATION  (Steps 3a–3g)
+// ════════════════════════════════════════════════════════════
+function computeVizdf(prices, news) {
+  const newsMap = {};
+  news.forEach(n => {
+    if (!newsMap[n.date]) newsMap[n.date] = [];
+    newsMap[n.date].push(n);
+  });
+
+  const enriched = prices.map((p, i) => {
+    const prev   = i > 0 ? prices[i - 1] : null;
+    const pctChg = prev ? +((p.close - prev.close) / prev.close * 100).toFixed(2) : null;
+    const dn     = newsMap[p.date] || [];
+    return {
+      ...p,
+      avgPrice: +((p.high + p.low) / 2).toFixed(4),
+      daily_pct_change    : pctChg,
+      price_drop          : prev ? p.close < prev.close : false,
+      price_rise          : prev ? p.close > prev.close : false,
+      negative_sentiment  : dn.some(n => n.label === 'Negative'),
+      positive_sentiment  : dn.some(n => n.label === 'Positive'),
+      negative_red_circle : false,
+      positive_green_circle: false,
+      confirmation_date   : null,
+      cumulative_pct      : null,
+      trend_start_date    : null,
+      n_days              : null,
+      ma3_drop_pct        : null,
+      ma3_rise_pct        : null
+    };
+  });
+
+  // ── DOWNTREND WINDOWS ──
+  let inDown = false, downStart = -1;
+  for (let i = 1; i < enriched.length; i++) {
+    if (!inDown && enriched[i].price_drop) { inDown = true; downStart = i; }
+    if (inDown) {
+      if (i >= downStart + 2) {
+        const slice = enriched.slice(Math.max(0, i - 2), i + 1).map(x => x.daily_pct_change || 0);
+        enriched[i].ma3_drop_pct = +(slice.reduce((a, b) => a + b, 0) / slice.length).toFixed(2);
+        if (enriched[i].ma3_drop_pct > 0 && i - downStart >= 3) { inDown = false; downStart = -1; continue; }
+      }
+      if (enriched[i].negative_sentiment) {
+        enriched[downStart].negative_red_circle = true;
+        enriched[downStart].confirmation_date   = enriched[i].date;
+        enriched[downStart].trend_start_date    = enriched[downStart].date;
+        enriched[downStart].cumulative_pct      = +((enriched[i].close - enriched[downStart].close) / enriched[downStart].close * 100).toFixed(2);
+        const d1 = new Date(enriched[downStart].date), d2 = new Date(enriched[i].date);
+        enriched[downStart].n_days = Math.round((d2 - d1) / 86400000);
+        inDown = false; downStart = -1;
+      }
+    }
+  }
+
+  // ── UPTREND WINDOWS ──
+  let inUp = false, upStart = -1;
+  for (let i = 1; i < enriched.length; i++) {
+    if (!inUp && enriched[i].price_rise) { inUp = true; upStart = i; }
+    if (inUp) {
+      if (i >= upStart + 2) {
+        const slice = enriched.slice(Math.max(0, i - 2), i + 1).map(x => x.daily_pct_change || 0);
+        enriched[i].ma3_rise_pct = +(slice.reduce((a, b) => a + b, 0) / slice.length).toFixed(2);
+        if (enriched[i].ma3_rise_pct < 0 && i - upStart >= 3) { inUp = false; upStart = -1; continue; }
+      }
+      if (enriched[i].positive_sentiment) {
+        enriched[upStart].positive_green_circle = true;
+        enriched[upStart].confirmation_date     = enriched[i].date;
+        enriched[upStart].trend_start_date      = enriched[upStart].date;
+        enriched[upStart].cumulative_pct        = +((enriched[i].close - enriched[upStart].close) / enriched[upStart].close * 100).toFixed(2);
+        const d1 = new Date(enriched[upStart].date), d2 = new Date(enriched[i].date);
+        enriched[upStart].n_days = Math.round((d2 - d1) / 86400000);
+        inUp = false; upStart = -1;
+      }
+    }
+  }
+  return enriched;
+}
+
+const VIZDF = computeVizdf(PRICE_DATA, NEWS_DATA);
+
+// ════════════════════════════════════════════════════════════
+//  STATS BAR
+// ════════════════════════════════════════════════════════════
+(function () {
+  const N   = NEWS_DATA.length;
+  const pos = NEWS_DATA.filter(n => n.label === 'Positive').length;
+  const neg = NEWS_DATA.filter(n => n.label === 'Negative').length;
+  const neu = NEWS_DATA.filter(n => n.label === 'Neutral').length;
+  const avg = NEWS_DATA.reduce((a, n) => a + n.sentiment_score, 0) / N;
+  document.getElementById('avg-sc').textContent  = avg.toFixed(4);
+  document.getElementById('pct-p').textContent   = Math.round(pos / N * 100) + '%';
+  document.getElementById('pct-n').textContent   = Math.round(neg / N * 100) + '%';
+  document.getElementById('pct-u').textContent   = Math.round(neu / N * 100) + '%';
+  document.getElementById('art-ct').textContent  = N;
+})();
+
+// ════════════════════════════════════════════════════════════
+//  CHART
+// ════════════════════════════════════════════════════════════
+const labels  = VIZDF.map(d => d.date);
+const closes  = VIZDF.map(d => d.close);
+const volumes = VIZDF.map(d => d.volume);
+const newsDateSet = new Set(NEWS_DATA.map(n => n.date));
+
+const yMin = Math.min(...closes) * 0.85;
+const yMax = Math.max(...closes) * 1.15;
+
+const volColors = VIZDF.map(d => newsDateSet.has(d.date)
+  ? 'rgba(100,181,246,0.20)'
+  : 'rgba(30,58,95,0.50)');
+
+const myChart = new Chart(document.getElementById('myChart'), {
+  data: {
+    labels,
+    datasets: [
+      {
+        type: 'line', label: 'Close', data: closes, yAxisID: 'yP',
+        borderColor: '#4a90d9', borderWidth: 1.8, tension: 0.2,
+        pointRadius: 0, fill: false, order: 1
+      },
+      {
+        type: 'bar', label: 'Volume', data: volumes, yAxisID: 'yV',
+        backgroundColor: volColors, order: 2
+      }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    animation: { duration: 600, onComplete: () => renderDots() },
+    layout: { padding: { top: 22, right: 22, bottom: 10, left: 10 } },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        enabled: true,
+        filter: item => item.datasetIndex === 0,
+        callbacks: {
+          label: ctx => `  Close: ${ctx.parsed.y.toFixed(2)}p`
+        }
+      }
+    },
+    scales: {
+      x: {
+        ticks: {
+          color: '#555', font: { size: 9 }, maxRotation: 50,
+          callback: (val, idx) => labels[idx] ? labels[idx].substring(5) : ''
+        },
+        grid: { color: 'rgba(255,255,255,0.025)' }
+      },
+      yP: {
+        position: 'left', min: yMin, max: yMax,
+        ticks: { color: '#555', font: { size: 9 }, callback: v => v.toFixed(0) + 'p' },
+        grid: { color: 'rgba(255,255,255,0.035)' }
+      },
+      yV: {
+        position: 'right', grid: { drawOnChartArea: false },
+        ticks: { color: '#2a2a2a', font: { size: 8 }, callback: v => (v / 1e6).toFixed(1) + 'M' }
+      }
+    },
+    onHover: (evt, elements) => onChartHover(evt, elements)
+  }
+});
+
+// ════════════════════════════════════════════════════════════
+//  DOT OVERLAY  (renderDots)
+// ════════════════════════════════════════════════════════════
+const DOT_MIN = 5, DOT_MAX = 15, BLUE_R = 5;
+let activeIdx = -1;
+
+function renderDots() {
+  const overlay = document.getElementById('dot-overlay');
+  overlay.innerHTML = '';
+  const canvas  = document.getElementById('myChart');
+  const xScale  = myChart.scales.x;
+  const yScale  = myChart.scales.yP;
+  if (!xScale || !yScale) return;
+
+  overlay.style.width  = canvas.offsetWidth  + 'px';
+  overlay.style.height = canvas.offsetHeight + 'px';
+
+  const NS = 'http://www.w3.org/2000/svg';
+
+  VIZDF.forEach((day, i) => {
+    const xPx = xScale.getPixelForValue(i);
+    const yPx = yScale.getPixelForValue(day.close);
+    if (isNaN(xPx) || isNaN(yPx)) return;
+
+    // ── SVG wrapper for price dot + rings ──
+    const svgSize = 32;
+    const svg = document.createElementNS(NS, 'svg');
+    svg.style.cssText = `position:absolute;left:${xPx - svgSize/2}px;top:${yPx - svgSize/2}px;width:${svgSize}px;height:${svgSize}px;overflow:visible;pointer-events:auto`;
+    const cx = svgSize / 2, cy = svgSize / 2;
+
+    // Blue price dot
+    const dot = document.createElementNS(NS, 'circle');
+    dot.setAttribute('cx', cx); dot.setAttribute('cy', cy);
+    dot.setAttribute('r', BLUE_R);
+    dot.setAttribute('fill', '#64b5f6');
+    dot.setAttribute('opacity', activeIdx === i ? '0.95' : '0.75');
+    svg.appendChild(dot);
+
+    // Red ring
+    if (day.negative_red_circle) {
+      const ring = document.createElementNS(NS, 'circle');
+      ring.setAttribute('cx', cx); ring.setAttribute('cy', cy);
+      ring.setAttribute('r', BLUE_R + 4);
+      ring.setAttribute('fill', 'none');
+      ring.setAttribute('stroke', '#ff1744');
+      ring.setAttribute('stroke-width', '1.8');
+      svg.appendChild(ring);
+    }
+    // Green ring
+    if (day.positive_green_circle) {
+      const ring = document.createElementNS(NS, 'circle');
+      ring.setAttribute('cx', cx); ring.setAttribute('cy', cy);
+      ring.setAttribute('r', BLUE_R + 4);
+      ring.setAttribute('fill', 'none');
+      ring.setAttribute('stroke', '#00c853');
+      ring.setAttribute('stroke-width', '1.8');
+      svg.appendChild(ring);
+    }
+
+    svg.style.cursor = 'pointer';
+    svg.addEventListener('mouseenter', e => showPriceTooltip(e, i));
+    svg.addEventListener('mouseleave', () => hideTooltip());
+    svg.addEventListener('click',      () => { activeIdx = i; renderDots(); pinByPriceIdx(i); });
+    overlay.appendChild(svg);
+
+    // ── Sentiment dots above price dot ──
+    const dayNews = NEWS_DATA.filter(n => n.date === day.date);
+    dayNews.forEach((art, si) => {
+      const sz   = Math.max(DOT_MIN, Math.min(DOT_MAX, DOT_MIN + Math.abs(art.sentiment_score) * (DOT_MAX - DOT_MIN)));
+      const yOff = yPx - BLUE_R - 5 - (sz + 3) * si - sz;
+      const sdiv = document.createElement('div');
+      sdiv.style.cssText = [
+        `position:absolute`,
+        `width:${sz}px`,`height:${sz}px`,
+        `border-radius:50%`,
+        `left:${xPx - sz/2}px`,`top:${yOff}px`,
+        `cursor:pointer`,
+        `pointer-events:auto`,
+        `opacity:0.45`,
+        `transition:opacity .15s`,
+        `background:${art.label === 'Positive' ? '#00c853' : art.label === 'Negative' ? '#ff1744' : '#9e9e9e'}`
+      ].join(';');
+      const nIdx = NEWS_DATA.indexOf(art);
+      sdiv.addEventListener('mouseenter', e => { sdiv.style.opacity = '0.92'; showSentimentTooltip(e, i, nIdx); });
+      sdiv.addEventListener('mouseleave', ()  => { sdiv.style.opacity = '0.45'; hideTooltip(); });
+      sdiv.addEventListener('click', e => { e.stopPropagation(); pinArticle(nIdx); });
+      overlay.appendChild(sdiv);
+    });
+  });
+}
+
+// ════════════════════════════════════════════════════════════
+//  TOOLTIP
+// ════════════════════════════════════════════════════════════
+const tt = document.getElementById('tt');
+function hideTooltip() { tt.style.display = 'none'; }
+function posTooltip(e) {
+  const W = window.innerWidth, H = window.innerHeight;
+  let x = e.clientX + 15, y = e.clientY - 12;
+  if (x + 300 > W) x = e.clientX - 304;
+  if (y + 230 > H) y = e.clientY - 234;
+  tt.style.left = x + 'px'; tt.style.top = y + 'px';
+  tt.style.display = 'block';
+}
+document.addEventListener('mousemove', e => { if (tt.style.display !== 'none') posTooltip(e); });
+
+function ohlcHtml(i) {
+  const d = VIZDF[i];
+  return `<div class="tt-date">${d.date}</div>
+<div class="tt-ohlc">Close: <b>${d.close.toFixed(2)}p</b> &nbsp;|&nbsp; Vol: ${(d.volume/1e6).toFixed(2)}M</div>
+<div class="tt-ohlc">O:${d.open.toFixed(2)} &nbsp;H:${d.high.toFixed(2)} &nbsp;L:${d.low.toFixed(2)}</div>`;
+}
+function ringHtml(d) {
+  if (d.negative_red_circle) return `<div class="tt-sep">───</div><div class="tt-down">▼ Downtrend start ${d.trend_start_date} — confirmed by Negative news on ${d.confirmation_date}. Cumulative move: ${d.cumulative_pct}% | ${d.n_days} days</div>`;
+  if (d.positive_green_circle) return `<div class="tt-sep">───</div><div class="tt-up">▲ Uptrend start ${d.trend_start_date} — confirmed by Positive news on ${d.confirmation_date}. Cumulative move: +${d.cumulative_pct}% | ${d.n_days} days</div>`;
+  return '';
+}
+
+function showPriceTooltip(e, i) {
+  tt.innerHTML = ohlcHtml(i) + ringHtml(VIZDF[i]);
+  posTooltip(e);
+}
+function showSentimentTooltip(e, priceI, newsI) {
+  const art = NEWS_DATA[newsI];
+  const tc  = art.type === 'filing' ? 'b-filing' : art.type === 'analyst' ? 'b-analyst' : 'b-news';
+  const lc  = art.label === 'Positive' ? 'b-pos' : art.label === 'Negative' ? 'b-neg' : 'b-neu';
+  tt.innerHTML = ohlcHtml(priceI)
+    + `<div class="tt-sep">───</div>`
+    + `<span class="badge ${tc}">${art.type||'news'}</span> <span class="badge ${lc}">${art.label}</span>`
+    + `<div style="margin-top:4px;color:#ddd;font-size:10px">${art.title.substring(0,72)}…</div>`
+    + ringHtml(VIZDF[priceI]);
+  posTooltip(e);
+}
+
+// ════════════════════════════════════════════════════════════
+//  TABLE
+// ════════════════════════════════════════════════════════════
+let sortCol = 'date', sortDir = 1;
+let pinnedNewsIdx = -1;
+
+function buildTable() {
+  const tbody  = document.getElementById('tbody');
+  tbody.innerHTML = '';
+  const sorted = [...NEWS_DATA]
+    .map((a, i) => ({ ...a, _origIdx: i }))
+    .sort((a, b) => {
+      const av = a[sortCol] ?? '', bv = b[sortCol] ?? '';
+      if (typeof av === 'string') return av.localeCompare(bv) * sortDir;
+      return (av - bv) * sortDir;
+    });
+
+  sorted.forEach(art => {
+    const i   = art._origIdx;
+    const tc  = art.type === 'filing' ? 'b-filing' : art.type === 'analyst' ? 'b-analyst' : 'b-news';
+    const lc  = art.label === 'Positive' ? 'b-pos' : art.label === 'Negative' ? 'b-neg' : 'b-neu';
+    const sc  = art.sentiment_score > 0 ? 'c-pos' : art.sentiment_score < 0 ? 'c-neg' : 'c-neu';
+    const sTitle = art.title.length > 55 ? art.title.substring(0, 55) + '…' : art.title;
+    const sAuth  = (art.author || '—').length > 22 ? art.author.substring(0, 22) + '…' : (art.author || '—');
+
+    const tr = document.createElement('tr');
+    tr.dataset.idx = i;
+    tr.innerHTML = `
+      <td class="date-cell">${art.date}</td>
+      <td class="title-cell"><a href="${art.link}" target="_blank" rel="noopener" title="${art.title}" onclick="event.stopPropagation()">${sTitle}</a></td>
+      <td><span class="badge ${tc}">${art.type || 'news'}</span></td>
+      <td style="font-size:10px;color:#9e9e9e;white-space:nowrap">${art.domain}</td>
+      <td style="font-size:10px;color:#9e9e9e" title="${art.author||''}">${sAuth}</td>
+      <td style="font-family:'Courier New',monospace;font-size:10px;color:#9e9e9e">${art.prob_positive.toFixed(4)}</td>
+      <td style="font-family:'Courier New',monospace;font-size:10px;color:#9e9e9e">${art.prob_negative.toFixed(4)}</td>
+      <td><span class="badge ${lc}">${art.label}</span></td>
+      <td class="${sc}" style="font-family:'Courier New',monospace;font-size:10px">${art.sentiment_score.toFixed(4)}</td>`;
+    tr.addEventListener('mouseenter', () => onRowHover(i, true));
+    tr.addEventListener('mouseleave', () => onRowHover(i, false));
+    tr.addEventListener('click',      () => pinArticle(i));
+    tbody.appendChild(tr);
+  });
+  refreshSortArrows();
+}
+
+function onRowHover(idx, on) {
+  document.querySelectorAll('#tbody tr').forEach(r => {
+    if (+r.dataset.idx === idx) { on ? r.classList.add('hl') : r.classList.remove('hl'); }
+  });
+  if (on) {
+    const art = NEWS_DATA[idx];
+    const pi  = VIZDF.findIndex(d => d.date === art.date);
+    if (pi >= 0) { activeIdx = pi; renderDots(); }
+    if (pinnedNewsIdx < 0) showSummary(idx, false);
+    document.getElementById('infobar').textContent =
+      `${art.date} | ${art.title.substring(0, 90)} | Score: ${art.sentiment_score.toFixed(4)}`;
+  }
+}
+
+function pinArticle(idx) {
+  pinnedNewsIdx = idx;
+  document.querySelectorAll('#tbody tr').forEach(r => {
+    r.classList.remove('active');
+    if (+r.dataset.idx === idx) {
+      r.classList.add('active');
+      r.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  });
+  const art = NEWS_DATA[idx];
+  const pi  = VIZDF.findIndex(d => d.date === art.date);
+  if (pi >= 0) { activeIdx = pi; renderDots(); }
+  showSummary(idx, true);
+}
+
+function pinByPriceIdx(pi) {
+  const date     = VIZDF[pi].date;
+  const dayNews  = NEWS_DATA.filter(n => n.date === date);
+  if (dayNews.length > 0) pinArticle(NEWS_DATA.indexOf(dayNews[0]));
+  const d = VIZDF[pi];
+  document.getElementById('infobar').textContent =
+    `${d.date} | Close: ${d.close.toFixed(2)}p | High: ${d.high.toFixed(2)}p | Low: ${d.low.toFixed(2)}p | Vol: ${(d.volume/1e6).toFixed(2)}M | Articles: ${dayNews.length}`;
+}
+
+// ════════════════════════════════════════════════════════════
+//  SUMMARY PANEL
+// ════════════════════════════════════════════════════════════
+function showSummary(idx, pinned) {
+  const art = NEWS_DATA[idx];
+  const tc  = art.type === 'filing' ? 'b-filing' : art.type === 'analyst' ? 'b-analyst' : 'b-news';
+  const lc  = art.label === 'Positive' ? 'b-pos' : art.label === 'Negative' ? 'b-neg' : 'b-neu';
+  const sc  = art.sentiment_score > 0 ? '#00c853' : art.sentiment_score < 0 ? '#ff1744' : '#9e9e9e';
+  document.getElementById('sum-hdr').innerHTML =
+    `<span class="badge ${tc}">${art.type||'news'}</span><span class="badge ${lc}">${art.label}</span>${pinned ? '<span style="font-size:10px;margin-left:6px">📌 pinned</span>' : ''}`;
+  document.getElementById('sum-meta').innerHTML =
+    `<b><a href="${art.link}" target="_blank" rel="noopener" style="color:#64b5f6;text-decoration:none">${art.title}</a></b><br>
+Date: ${art.date} &nbsp;|&nbsp; ${art.domain} &nbsp;|&nbsp; ${art.author || '—'}<br>
+Sentiment Score: <span style="color:${sc};font-family:'Courier New',monospace">${art.sentiment_score.toFixed(4)}</span>
+&nbsp;|&nbsp; Prob+: <span style="font-family:'Courier New',monospace">${art.prob_positive.toFixed(4)}</span>
+&nbsp;|&nbsp; Prob−: <span style="font-family:'Courier New',monospace">${art.prob_negative.toFixed(4)}</span>`;
+  document.getElementById('sum-body').textContent = art.ag_summary;
+}
+
+// ════════════════════════════════════════════════════════════
+//  CHART HOVER
+// ════════════════════════════════════════════════════════════
+function onChartHover(evt, elements) {
+  if (!elements || elements.length === 0) return;
+  const i = elements[0].index;
+  if (i === activeIdx) return;
+  activeIdx = i;
+  renderDots();
+  const d = VIZDF[i];
+  const dayNews = NEWS_DATA.filter(n => n.date === d.date);
+  document.getElementById('infobar').textContent =
+    `${d.date} | Close: ${d.close.toFixed(2)}p | High: ${d.high.toFixed(2)}p | Low: ${d.low.toFixed(2)}p | Vol: ${(d.volume/1e6).toFixed(2)}M | Articles: ${dayNews.length}`;
+  document.querySelectorAll('#tbody tr').forEach(r => {
+    const art = NEWS_DATA[+r.dataset.idx];
+    art && art.date === d.date ? r.classList.add('hl') : r.classList.remove('hl');
+  });
+  const firstMatch = NEWS_DATA.findIndex(n => n.date === d.date);
+  if (firstMatch >= 0 && pinnedNewsIdx < 0) showSummary(firstMatch, false);
+  const matchRow = document.querySelector(`#tbody tr[data-idx="${firstMatch}"]`);
+  if (matchRow) matchRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// ════════════════════════════════════════════════════════════
+//  SORT
+// ════════════════════════════════════════════════════════════
+document.querySelectorAll('th[data-col]').forEach(th => {
+  th.addEventListener('click', () => {
+    const col = th.dataset.col;
+    if (sortCol === col) sortDir *= -1; else { sortCol = col; sortDir = 1; }
+    buildTable();
+  });
+});
+function refreshSortArrows() {
+  document.querySelectorAll('th[data-col]').forEach(th => {
+    const sp = th.querySelector('.sort-arrow');
+    if (!sp) return;
+    sp.textContent = th.dataset.col === sortCol ? (sortDir > 0 ? ' ▲' : ' ▼') : '';
+  });
+}
+
+// ════════════════════════════════════════════════════════════
+//  SPLITTERS
+// ════════════════════════════════════════════════════════════
+(function () {
+  // Horizontal (chart ↔ bottom row)
+  const hs = document.getElementById('hsplit');
+  const cs = document.getElementById('chart-section');
+  const ws = document.getElementById('workspace');
+  let hdrag = false, hY0, hH0;
+  hs.addEventListener('mousedown', e => {
+    hdrag = true; hY0 = e.clientY; hH0 = cs.offsetHeight;
+    hs.classList.add('drag'); e.preventDefault();
+  });
+  document.addEventListener('mousemove', e => {
+    if (!hdrag) return;
+    const newH = Math.max(80, Math.min(hH0 + (e.clientY - hY0), ws.offsetHeight - 100));
+    cs.style.height = newH + 'px'; cs.style.flex = 'none';
+    myChart.resize(); renderDots();
+  });
+  document.addEventListener('mouseup', () => {
+    if (hdrag) { hdrag = false; hs.classList.remove('drag'); myChart.resize(); renderDots(); }
+  });
+
+  // Vertical (table ↔ summary)
+  const vs = document.getElementById('vsplit');
+  const ts = document.getElementById('tbl-section');
+  let vdrag = false, vX0, vW0;
+  vs.addEventListener('mousedown', e => {
+    vdrag = true; vX0 = e.clientX; vW0 = ts.offsetWidth;
+    vs.classList.add('drag'); e.preventDefault();
+  });
+  document.addEventListener('mousemove', e => {
+    if (!vdrag) return;
+    const newW = Math.max(180, vW0 + (e.clientX - vX0));
+    ts.style.width = newW + 'px'; ts.style.flex = 'none';
+  });
+  document.addEventListener('mouseup', () => {
+    if (vdrag) { vdrag = false; vs.classList.remove('drag'); }
+  });
+})();
+
+// ════════════════════════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════════════════════════
+(function init() {
+  const ws = document.getElementById('workspace');
+  const cs = document.getElementById('chart-section');
+  cs.style.height = Math.max(260, Math.floor(ws.offsetHeight * 0.56)) + 'px';
+  cs.style.flex = 'none';
+  document.getElementById('tbl-section').style.width = '63%';
+  document.getElementById('tbl-section').style.flex  = 'none';
+  buildTable();
+  setTimeout(() => { myChart.resize(); renderDots(); }, 220);
+  window.addEventListener('resize', () => { myChart.resize(); setTimeout(renderDots, 80); });
+})();
+</script>
+</body>
+</html>
