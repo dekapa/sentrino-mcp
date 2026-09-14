@@ -21,7 +21,7 @@ From date: <yyyy-mm-dd>
 To date: <yyyy-mm-dd>
 ```
 
-![Screenshot 2026-09-14 8.44.28 PM](Sentrino Dashboard.png)
+![Sentrino Dashboard.png](https://github.com/dekapa/sentrino-mcp/blob/main/Sentrino%20Dashboard.png)
 
 ---
 ## Key Features
