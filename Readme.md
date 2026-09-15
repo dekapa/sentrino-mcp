@@ -135,7 +135,10 @@ A single self-contained `.html` file delivered in the chat — open in any brows
 ```
 WIZZ.L 2026-03-11 to 2026-05-31.html
 ```
-Download the interactive dashboard for viewing [WIZZ.L 2026-03-11 to 2026-05-31.html](https://htmlpreview.github.io/?https://github.com/dekapa/sentrino-mcp/blob/main/WIZZ.L_2026-03-11_to_2026-05-31.html)
+
+click the link for the interactive dashboard [WIZZ.L 2026-03-11 to 2026-05-31.html](https://htmlpreview.github.io/?https://github.com/dekapa/sentrino-mcp/blob/main/WIZZ.L_2026-03-11_to_2026-05-31.html)
+
+*Note: in case the above link does not render properly then visit the github repo and dowload the file with the same name*
 
 ---
 
