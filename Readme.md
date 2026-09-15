@@ -221,7 +221,7 @@ xi. Overlay of the organisation trading (order and execution) data and integrati
 
 General enquiries including custamization, enterprise adoption,Licensing and suggestions for improvement: <sentrino@sentimeter-lab.com>
 
-You can also send in pull request in the github repo![Github Repo](https://github.com/dekapa/sentrino-mcp)
+You can also send in pull request in the github repo [Github Repo](https://github.com/dekapa/sentrino-mcp)
 
 ---
 
