@@ -20,7 +20,6 @@ Company nmae: <compay name>
 From date: <yyyy-mm-dd> 
 To date: <yyyy-mm-dd>
 ```
-
 ![Sentrino Dashboard.png](https://github.com/dekapa/sentrino-mcp/blob/main/Sentrino%20Dashboard.png)
 
 ---
@@ -46,9 +45,9 @@ To date: <yyyy-mm-dd>
 
 | Global user | Utility and value draw|
 |---|---|
-| Invetment Banks, Investment/ Portfolio Managers,  Retail & HNI investors | Understand financial sentiment context behind price and volume moves |
-| Compliance analysts | Cross-reference sentiment change and price-volume change with news article publish timing |
-| Financial researchers | Assess and trace impact of research reports on ticker price and volume across multiple venues |
+| Retail & HNI investors, Invetment Banks, Investment/ Portfolio Managers| Understand financial news sentiment context behind price and volume moves|
+| Compliance analysts | Cross-reference sentiment change and price-volume change with news article publish timing|
+| Financial researchers | Assess and trace impact of research reports on ticker price and volume across multiple venues|
  
 
 ## Requirements
@@ -74,7 +73,7 @@ To date: <yyyy-mm-dd>
 ## Getting Trial Access and Subscription
 
 ### Lemon Squeezy Link
-- Use this link for trial followed by subscription. Subscriber needs to share the card detailsand subscription starts immediately after the trial unless specifically cancelled by the subscriber
+- Use this link for trial followed by subscription. Subscriber needs to share the card details and subscription starts immediately after the trial unless specifically cancelled by the subscriber
 
 ### Individual Access (without sharing card details)
 - Email **<sentrino@sentimeter-lab.com>** with subject line: `Sentrino Trial Request` 
@@ -82,7 +81,7 @@ To date: <yyyy-mm-dd>
 - You will receive your API key, setup instructions and subsription link (payment is handled via Lemon Squeezy) within 24 hours
 The same API key will be activated for further use after subscription payment is received.
 
-### Enterprise & Licensing
+### Enterprise Access and Licensing
 - For enterprise deployment, white-labelling, custom integration into your organisation's AI environment (including non-Claude enterprise AI chat models), or licensing enquiries, email **<sentrino@sentimeter-lab.com>** with subject: `Sentrino Enterprise customisation request`.
 
 ---
@@ -122,15 +121,28 @@ Inside your Sentrino project, start a **New conversation** → click **+** (bott
 ### 5 — Run
 
 ```
-/Sentrino run TICKER COMPANY FROM_DATE TO_DATE
+/Sentrino run 
+Ticker: <ticker.exchange>
+Company nmae: <compay name>
+From date: <yyyy-mm-dd> 
+To date: <yyyy-mm-dd>
 ```
+
+## Output
+
+A single self-contained `.html` file delivered in the chat — open in any browser
+
+```
+WIZZ.L 2026-03-11 to 2026-05-31.html
+```
+Download the interactive dashboard for viewing [WIZZ.L 2026-03-11 to 2026-05-31.html](https://htmlpreview.github.io/?https://github.com/dekapa/sentrino-mcp/blob/main/WIZZ.L_2026-03-11_to_2026-05-31.html)
+
+---
 
 **Example prompts:**
 
-- i) First prompt
-```
-/sentrino run NVDA NVIDIA 2025-02-01 2025-02-28
-```
+- i) First prompt as above
+
 - ii) Extend the coverage period
 ```
 Run the Sentrino for NVDA for the period from 2022-03-01 to 2022-05-31 AND and add it to the same dashboard generated above.
@@ -146,23 +158,12 @@ list top 3 news articles which witnessed the most price impact before the publis
 - v) Predict price range
 
 ```
-Given the Sentiment built over last x months based on the news articles, company filings and research analyst recommendations what is a price range one can expect in next 10 days. Keep your response grounded only based on the information in this chat instance.
+Given the Sentiment built over last x months based on the news articles, company filings and research analyst recommendations, what is a price range one can expect in next 2 days. Keep your response grounded only based on the information in this chat instance.
 ```
 
 > **Tips:** 
 i) Keep the date range to **4–6 weeks per run**. Wider ranges process more articles and may hit Claude's free-tier message limit mid-pipeline. For longer periods, run in shorter batches.Ignore these instructions if you have claude subscription
 ii) Hosted on Render (always-on) - First response after inactivity may take up to 60 seconds — Claude will wait automatically
-
----
-
-## Output
-
-A single self-contained `.html` file delivered in the chat — open in any browser, no internet connection required after download.
-
-```
-WIZZ.L 2026-03-11 to 2026-05-31.html
-```
-Download the interactive dashboard for viewing [WIZZ.L 2026-03-11 to 2026-05-31.html](https://github.com/dekapa/sentrino-mcp/blob/main/WIZZ.L_2026-03-11_to_2026-05-31.html)
 
 ---
 
@@ -173,7 +174,7 @@ Download the interactive dashboard for viewing [WIZZ.L 2026-03-11 to 2026-05-31.
 | `Error 401` | API key entered incorrectly — paste it again with no quotes or spaces |
 | Server slow on first call | Wait 60 seconds — it wakes automatically |
 | Pipeline stops mid-run | Date range is too wide — shorten to 4–6 weeks and retry or wait till your free-tier tokens are reinstated. Ask for completing the process terminated in the chat window|
-| No articles found | Try another date range or different company ticker of the same company on another exchange for a test run. It is that there is no news on the company |
+| No articles found | Try another date range or different company ticker of the same company on another exchange for a test run. It is likely that there is no news on the company |
 
 ---
 
@@ -189,15 +190,15 @@ Download the interactive dashboard for viewing [WIZZ.L 2026-03-11 to 2026-05-31.
 
 - i. Tick-by-tick price granularity
 
-- ii. Timezone-aware and news timestamp granularity
+- ii. Timezone-aware and news items timestamp granularity
 
-- iii. Comparison with OHL (open, high, low) and weighted average prices
+- iii. Comparison with OHL (open, high, low) and weighted average (wa) prices
 
-- iv. Comparison with derivative and index price-volume (sector and market indices, competitor tickers)
+- iv. Sectoral or Industry news coverage
 
-- v. Sectoral or Industry news coverage
+- v. Non-English news coverage and sentiment scoring 
 
-- vi. Non-English news coverage and sentiment scoring
+- vi. Comparison with derivative and index price-volume including sector and market indices and competitor tickers
 
 - vii. Develop correlation scores between sentiment and price-volume change
 
@@ -213,7 +214,7 @@ Download the interactive dashboard for viewing [WIZZ.L 2026-03-11 to 2026-05-31.
 
 ## Contact
 
-**General enquiries including custamization and Enterprise adoption Licensing:** <sentrino@sentimeter-lab.com>
+**General enquiries including custamization, enterprise adoption and Licensing:** <sentrino@sentimeter-lab.com>
 
 ---
 
