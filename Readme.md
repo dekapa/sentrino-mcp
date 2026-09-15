@@ -20,7 +20,7 @@ Company nmae: <compay name>
 From date: <yyyy-mm-dd> 
 To date: <yyyy-mm-dd>
 ```
-![Sentrino Dashboard.png](https://github.com/dekapa/sentrino-mcp/blob/main/Sentrino%20Dashboard.png)
+[Sentrino Dashboard.png](https://github.com/dekapa/sentrino-mcp/blob/main/Sentrino%20Dashboard.png)
 
 ---
 ## Key Features
@@ -74,6 +74,8 @@ To date: <yyyy-mm-dd>
 
 ### Lemon Squeezy Link
 - Use this link for trial followed by subscription. Subscriber needs to share the card details and subscription starts immediately after the trial unless specifically cancelled by the subscriber
+
+[5 day freetTrial and subscription link](https://sentimeter-lab.lemonsqueezy.com/checkout/buy/ef6fa11d-0026-4974-8a39-4522a4ea9b43)
 
 ### Individual Access (without sharing card details)
 - Email **<sentrino@sentimeter-lab.com>** with subject line: `Sentrino Trial Request` 
