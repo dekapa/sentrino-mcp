@@ -4,7 +4,7 @@ from Sentimeter-lab
 > **Agentic AI pipeline that searches financial news, scores sentiment, and delivers an interactive price-sentiment dashboard — triggered by a single command inside Claude.**
 
 
-[![Category](https://img.shields.io/badge/category-finance-blue)]()[![Version](https://img.shields.io/badge/version-1.0-gold)]()[![Claude Compatible](https://img.shields.io/badge/claude-free%20%7C%20pro-green)]()[![Trial](https://img.shields.io/badge/trial-5%20days%20free-brightgreen)]()
+[![Category](https://img.shields.io/badge/category-finance-blue)]() [![Version](https://img.shields.io/badge/version-1.0-gold)]() [![Claude Compatible](https://img.shields.io/badge/claude-free%20%7C%20pro-green)]() [![Trial](https://img.shields.io/badge/trial-5%20days%20free-brightgreen)]()
 
 ---
 
@@ -144,21 +144,21 @@ click the link for the interactive dashboard [WIZZ.L 2026-03-11 to 2026-05-31.ht
 
 **Example prompts:**
 
-- i) First prompt as above
+i) First prompt as above
 
-- ii) Extend the coverage period
+ii) Extend the coverage period
 ```
 Run the Sentrino for NVDA for the period from 2022-03-01 to 2022-05-31 AND and add it to the same dashboard generated above.
 ```
-- iii) Adding news links sourced from other AI chat models
+iii) Adding news links sourced from other AI chat models
 ```
 Add the news links below to the dashboard 
 ```
-- iv) Since the news, sentiment and price-volume data is in the same project instance, you can ask questions such as below.
+iv) Since the news, sentiment and price-volume data is in the same project instance, you can ask questions such as below.
 ```
 list top 3 news articles which witnessed the most price impact before the publishing of the news article
 ```
-- v) Predict price range
+v) Predict price range
 
 ```
 Given the Sentiment built over last x months based on the news articles, company filings and research analyst recommendations, what is a price range one can expect in next 2 days. Keep your response grounded only based on the information in this chat instance.
@@ -191,33 +191,35 @@ ii) Hosted on Render (always-on) - First response after inactivity may take up t
 
 ## Roadmap - customization opportunities
 
-- i. Tick-by-tick price granularity
+i. Tick-by-tick price granularity
 
-- ii. Timezone-aware and news items timestamp granularity
+ii. Timezone-aware and news items timestamp granularity
 
-- iii. Comparison with OHL (open, high, low) and weighted average (wa) prices
+iii. Comparison with OHL (open, high, low) and weighted average (wa) prices
 
-- iv. Sectoral or Industry news coverage
+iv. Sectoral or Industry news coverage
 
-- v. Non-English news coverage and sentiment scoring 
+v. Non-English news coverage and sentiment scoring 
 
-- vi. Comparison with derivative and index price-volume including sector and market indices and competitor tickers
+vi. Comparison with derivative and index price-volume including sector and market indices and competitor tickers
 
-- vii. Develop correlation scores between sentiment and price-volume change
+vii. Develop correlation scores between sentiment and price-volume change
 
-- viii. Market Greek indicators overlay
+viii. Market Greek indicators overlay
 
-- ix. Social media and blog sentiment overlay
+ix. Social media and blog sentiment overlay
 
-- x. BYOI — Bring Your Own Intel (upload proprietary or subscribed research report or analysis)
+x. BYOI — Bring Your Own Intel (upload proprietary or subscribed research report or analysis)
 
-- xi. Overlay of the organisation trading (order and execution) data and integrating it with enterprise AI Chat model(s) and case management systems
+xi. Overlay of the organisation trading (order and execution) data and integrating it with enterprise AI Chat model(s) and case management systems
 
 ---
 
 ## Contact
 
-**General enquiries including custamization, enterprise adoption and Licensing:** <sentrino@sentimeter-lab.com>
+General enquiries including custamization, enterprise adoption,Licensing and suggestions for improvement: <sentrino@sentimeter-lab.com>
+
+You can also send in pull request in the github repo![Github Repo](https://github.com/dekapa/sentrino-mcp/blob/tree/main)
 
 ---
 
