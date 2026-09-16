@@ -4,7 +4,7 @@ from Sentimeter-lab
 > **Agentic AI pipeline that searches financial news, scores sentiment, and delivers an interactive price-sentiment dashboard — triggered by a single command inside Claude.**
 
 
-[![Category](https://img.shields.io/badge/category-finance-blue)]() [![Version](https://img.shields.io/badge/version-1.0-gold)]() [![Claude Compatible](https://img.shields.io/badge/claude-free%20%7C%20pro-green)]() [![Trial](https://img.shields.io/badge/trial-5%20days%20free-brightgreen)]()
+[![Category](https://img.shields.io/badge/category-finance-blue)]() [![Version](https://img.shields.io/badge/version-1.0-gold)]() [![Claude Compatible](https://img.shields.io/badge/claude-free%20%7C%20pro-green)]() [![Trial](https://img.shields.io/badge/trial-5%20days%20free-brightgreen)]() [![Listed on mcpservers.org](https://mcpservers.org/badge.svg)](https://mcpservers.org/servers/github-com-dekapa-sentrino-mcp-blob-main-readme-md)
 
 ---
 
@@ -140,7 +140,7 @@ WIZZ.L 2026-03-11 to 2026-05-31.html
 
 click the link for the interactive dashboard [WIZZ.L 2026-03-11 to 2026-05-31.html](https://htmlpreview.github.io/?https://github.com/dekapa/sentrino-mcp/blob/main/WIZZ.L_2026-03-11_to_2026-05-31.html)
 
-*Note: in case the above link does not render properly then visit the github repo and dowload the file with the same name*
+*Note: in case the above link does not render properly then visit the github repo and download the file with the same name*
 
 ---
 
@@ -214,6 +214,8 @@ ix. Social media and blog sentiment overlay
 x. BYOI — Bring Your Own Intel (upload proprietary or subscribed research report or analysis)
 
 xi. Overlay of the organisation trading (order and execution) data and integrating it with enterprise AI Chat model(s) and case management systems
+
+xii. Integrate Bloomberg, Thomson Reuters or other market data APIs for news and tick price data
 
 ---
 
