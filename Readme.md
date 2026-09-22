@@ -4,7 +4,7 @@ from Sentimeter-lab
 > **Agentic AI pipeline that searches financial news, scores sentiment, and delivers an interactive price-sentiment dashboard — triggered by a single command inside Claude.**
 
 
-[![Category](https://img.shields.io/badge/category-finance-blue)]() [![Version](https://img.shields.io/badge/version-1.0-gold)]() [![Claude Compatible](https://img.shields.io/badge/claude-free%20%7C%20pro-green)]() [![Trial](https://img.shields.io/badge/trial-5%20days%20free-brightgreen)]() [![Listed on mcpservers.org](https://mcpservers.org/badge.svg)](https://mcpservers.org/servers/github-com-dekapa-sentrino-mcp-blob-main-readme-md)
+[![Category](https://img.shields.io/badge/category-finance-blue)]() [![Version](https://img.shields.io/badge/version-1.0-gold)]() [![Claude Compatible](https://img.shields.io/badge/Claude-free%20%7C%20pro-green)]() [![Perplexity Compatible](https://img.shields.io/badge/Perplexity-only%20%20pro-seagreen)]() [![Grok xAI Compatible](https://img.shields.io/badge/Grok-free%20%7C%20SuperGrok-forestgreen)]() [![Trial](https://img.shields.io/badge/trial-5%20days%20free-brightgreen)]() [![Listed on mcpservers.org](https://mcpservers.org/badge.svg)](https://mcpservers.org/servers/github-com-dekapa-sentrino-mcp-blob-main-readme-md)
 
 ---
 
@@ -35,9 +35,14 @@ To date: <yyyy-mm-dd>
 
 - **News article Summaries** — tone-preserving summaries for every article, displayed in the dashboard summary panel
 
-- **Multi Model Porting** — MCP can be used across multiple AI chat models though the output has only been tested for Claude
+- **Multi Model Porting** — MCP can be used across multiple AI chat models though the output has only been tested for Claude and Perplexity Pro
 
-*Note: All the news articles, research analyst reports and company law filings are collectively referred to as 'news items' or 'news articles' through this document for ease of reference*
+*Note: 
+i). All the news articles, research analyst reports and company law filings are collectively referred to as 'news items' or 'news articles' through this document for ease of reference
+
+---
+## Limitations
+- The quality of the output interactive HTML dashboard is a direct function of the AI Model's native search, summarization and scoring capability AND your remaining token credits. Ask the model to continue from where the execution was terminated in the previous session. The AI models are known to skip steps or reduce the websearch perimeter while approaching the free tier  limits.
 
 ---
 
@@ -65,7 +70,7 @@ To date: <yyyy-mm-dd>
 | Plan | Price | Includes |
 |---|---|---|
 | Free Trial | 5 days | Full access, personal API key |
-| Individual | £10 / month | Full access, personal API key |
+| Individual | £9.99 / month | Full access, personal API key |
 
 
 ---
